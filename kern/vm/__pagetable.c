@@ -4,11 +4,11 @@
 #include <spinlock.h>
 #include <lib.h>
 
-#define PG_LOCK_ACQUIRE() (spinlock_acquire(&base_pagetable->lock))
-#define PG_LOCK_RELEASE() (spinlock_release(&base_pagetable->lock))
+#define PG_LOCK_ACQUIRE() (spinlock_acquire(&page_directory->lock))
+#define PG_LOCK_RELEASE() (spinlock_release(&page_directory->lock))
 
-/* First level page table*/
-struct base_pagetable
+/* Page directory */
+struct page_directory
 {
     struct spinlock lock;      // Global spinlock for ALL page table and level 2 page table operations
     struct pagetable *entries; // Array of page tables
@@ -71,7 +71,7 @@ int pagetable_translate(int32_t *address)
     // int table_index = (_address >>= 10) & 0x3FF;
 
     // Search for level 2 page table
-    struct pagetable **pagetable_reference = &base_pagetable->entries[first_index];
+    struct pagetable **pagetable_reference = &page_directory->entries[first_index];
 
     PG_LOCK_ACQUIRE();
     // Create level 2 pagetable if it does not exist
@@ -95,40 +95,50 @@ int pagetable_translate(int32_t *address)
     return ((PAGE_SIZE * *frame) << 20) | offset;
 }
 
-struct base_pagetable *base_pagetable = NULL;
+struct page_directory *page_directory = NULL;
 
 /* 
  * Creates the first level page table. 
  */
-int base_pagetable_init()
+int page_directory_init()
 {
-    if (base_pagetable != NULL)
-        panic("base_pagetable_init called twice");
+    if (page_directory != NULL)
+        panic("page_directory_init called twice");
 
-    if ((base_pagetable = kmalloc(1024 * sizeof(struct pagetable))) == NULL)
+    if ((page_directory = kmalloc(1024 * sizeof(struct pagetable))) == NULL)
     {
         return 1;
     }
 
-    struct *spinlock base_pagetable_lock = NULL;
-    spinlock_init(base_pagetable_lock);
-    if (base_pagetable = NULL)
+    struct *spinlock lock = NULL;
+    spinlock_init(lock);
+    if (lock = NULL)
     {
         return 1;
     }
-    base_pagetable->lock = base_pagetable_lock;
+    // page_directory->lock = lock;
 
     paddr_t highest_physical_addr = ram_getsize();
     paddr_t lowest_physical_addr = ram_getfirstfree();
     unsigned int n_entries = (highest_physical_addr - lowest_physical_addr) / PAGESIZE;
 
-    if ((base_pagetable->entries = kmalloc(sizeof(struct pagetable) * n_entries)) == NULL)
+    if ((page_directory->entries = kmalloc(sizeof(struct pagetable) * n_entries)) == NULL)
     {
         return 1;
     }
 
-    bzero(base_pagetable->entries, n_entries * sizeof(struct pagetable));
+    bzero(page_directory->entries, n_entries * sizeof(struct pagetable));
 
     // Success
     return 0;
 }
+
+
+/*
+
+Jennifer's Thought Bubble
+
+
+
+
+*/
