@@ -1,5 +1,6 @@
 #include <__pagetable.h>
 #include <types.h>
+#include <vm.h>
 
 int pagetable_translate(int32_t * address) {
     int32_t _address = (int32_t) address;
@@ -14,10 +15,10 @@ int pagetable_translate(int32_t * address) {
 
     // FIXME: Check for Kernel address?
 
-    int offset = _address & 0xFFF; // Last 12 bits
-    int index = (_address >>= 12) & 0x3FF; // 
-    int table_index = (_address >>= 10) & 0x1FF;
-    int isKernelAddress = (_address >>= 9) & 1;
+    int offset = _address PAGE_FRAME
+    // int offset = _address & 0xFFF; // Last 12 bits
+    // int index = (_address >>= 12) & 0x3FF; // 
+    // int table_index = (_address >>= 10) & 0x3FF;
 
 
     // TODO: Do lookup
