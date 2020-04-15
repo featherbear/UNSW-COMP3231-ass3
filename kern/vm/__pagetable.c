@@ -4,7 +4,10 @@
 #include <spinlock.h>
 #include <lib.h>
 
-#define PAGESIZE 1024
+#define PG_LOCK_ACQUIRE() (spinlock_acquire(&base_pagetable->lock))
+#define PG_LOCK_RELEASE() (spinlock_release(&base_pagetable->lock))
+
+#define PAGESIZE 1024 // FIXME: This is defined in vm.h; also it's 4096
 
 /* First level page table*/
 struct base_pagetable
@@ -38,6 +41,7 @@ struct pagetable *create_pagetable()
 
     // Assign page table references
     pagetable->entries = kmalloc(sizeof(/* 2^10 entries */ 1024 * sizeof(int)));
+    kassert(pagetable->entries != NULL);
     bzero(pagetable->entries, 1024 * sizeof(int));
 
     return pagetable;
@@ -55,39 +59,55 @@ int pagetable_translate(int32_t *address)
 
     // FIXME: Check for Kernel address?
 
-    int page_number = (_address & PAGE_FRAME) >> 12;
+    int page_number = _address >> 12; // (_address & PAGE_FRAME) >> 12;
     int second_index = page_number & 0x3FF;
     int first_index = (page_number >> 10) & 0x3FF;
+
     int offset = _address & ~PAGE_FRAME;
 
     // int offset = _address & 0xFFF; // Last 12 bits
     // int index = (_address >>= 12) & 0x3FF; //
     // int table_index = (_address >>= 10) & 0x3FF;
 
-    // TODO: Do lookup
+    // Do lookup
+    struct pagetable **pagetable_reference = &base_pagetable->entries[first_index];
+    if (*pagetable_reference == NULL)
+    {
+        *pagetable_reference = create_pagetable();
+        kassert(*pagetable_reference != NULL);
+    }
 
-    // return (lookup << 20) | offset;
-    return 0;
+    int *frame = &if (pagetable_reference)
+
+                 // return ((PAGE_SIZE * lookup) << 20) | offset;
+                 return 0;
 }
+
+struct base_pagetable *base_pagetable = NULL;
 
 /* 
  * Creates the first level page table. 
  */
 int base_pagetable_init()
 {
-    struct base_pagetable *base_pagetable;
+    if (base_pagetable != NULL)
+        panic("base_pagetable_init called twice");
+
+    // TODO: Initialise spinlock
+
     if ((base_pagetable = kmalloc(1024 * sizeof(struct pagetable))) == NULL)
     {
         return NULL;
     }
 
-    paddr_t highest_physical_addr = ram_getsize(); // Within vm.h 
-    
+    paddr_t highest_physical_addr = ram_getsize();
+    paddr_t lowest_physical_addr = ram_getfirstfree();
+    unsigned int n_entries = (highest_physical_addr - lowest_physical_addr) / PAGESIZE;
 
-    // welp I remember nothing
-    // spinlock *base_pagetable_lock
-    // TODO: Initialise spinlock
-    // TODO: malloc space for 2^10 pagetable addresses ;; (RAMSIZE-FIRSTFREE) / PAGESIZE)
-    // TODO: rip if malloc returned null
-    // TODO: zero-fill
+    if ((base_pagetable->entries = kmalloc(sizeof(struct pagetable) * n_entries)) == NULL)
+    {
+        return NULL;
+    }
+
+    bzero(base_pagetable->entries, n_entries * sizeof(int));
 }
