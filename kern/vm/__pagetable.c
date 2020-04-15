@@ -5,17 +5,22 @@
 
 struct base_pagetable {
     struct spinlock lock;
-    struct pagetable *pages;
+    struct pagetable *entries;
 };
 
 struct pagetable {
     int n_entries;
-    
-
+    void* entries;
 };
 
 struct pagetable *create_pagetable() {
-
+    // TODO: initialise page table
+            // n_entries = 0
+            // malloc space for 2^10 entries
+            // rip if malloc returned null
+            // zero-fill
+        
+    // TODO: return new pagetable address
 }
 
 
@@ -50,8 +55,8 @@ int pagetable_translate(int32_t * address) {
 }
 
 int pagetable_init() {
-    // Initialise spinlock
-    // Malloc RAMSIZE-FIRSTFREE / PAGESIZE)pages
-
-
+    // TODO: Initialise spinlock
+    // TODO: malloc space for 2^10 pagetable addresses ;; (RAMSIZE-FIRSTFREE) / PAGESIZE)
+    // TODO: rip if malloc returned null
+    // TODO: zero-fill
 }
