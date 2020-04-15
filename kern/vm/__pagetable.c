@@ -95,28 +95,19 @@ int pagetable_translate(int32_t *address)
     return ((PAGE_SIZE * *frame) << 20) | offset;
 }
 
-struct pagedirectory *pagedirectory = NULL;
-
 /* 
  * Creates the first level page table. 
  */
-int pagedirectory_init()
+struct pagedirectory *pagedirectory_init()
 {
-    if (pagedirectory != NULL)
-        panic("pagedirectory_init called twice");
+    struct pagedirectory *pagedirectory = NULL;
 
-    if ((pagedirectory = kmalloc(1024 * sizeof(struct pagetable))) == NULL)
+    if ((pagedirectory = kmalloc(sizeof(struct pagetable))) == NULL)
     {
-        return 1;
+        return NULL;
     }
 
-    struct *spinlock lock = NULL;
-    spinlock_init(lock);
-    if (lock = NULL)
-    {
-        return 1;
-    }
-    // pagedirectory->lock = lock;
+    spinlock_init(&pagedirectory->lock);
 
     paddr_t highest_physical_addr = ram_getsize();
     paddr_t lowest_physical_addr = ram_getfirstfree();
@@ -137,10 +128,10 @@ int pagedirectory_init()
 
 Jennifer's Thought Bubble
 
-
-
-do (bubble.grow()) while 
-bubble.pop();
-
+try {
+    do (bubble.grow()) while true;
+} catch {
+    bubble.pop();
+}
 
 */
