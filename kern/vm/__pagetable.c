@@ -3,25 +3,28 @@
 #include <vm.h>
 #include <spinlock.h>
 
+/* First level page table*/
 struct base_pagetable
 {
     struct spinlock lock;
-    struct pagetable *entries;
+    struct pagetable *entries; // Should this be an array of page tables
 };
 
+/* Second level page table */
 struct pagetable
 {
     int n_entries;
-    void *entries;
+    // Shouldn't the page table have a spinlock too?
+    void *entries; // Should this be an array of entries
 };
 
 struct pagetable *create_pagetable()
 {
     // TODO: initialise page table
-    struct *pagetable = kmalloc()
-    if (pagetable == NULL) return EMEM;
-    // n_entries = 0
-    // malloc space for 2^10 entries
+    struct pagetable *new = kmalloc(sizeof(struct pagetable));
+    if (new == NULL)
+        return EMEM;
+
     // rip if malloc returned null
     // zero-fill
 
@@ -55,7 +58,7 @@ int pagetable_translate(int32_t *address)
     return 0;
 }
 
-int pagetable_init()
+int base_pagetable_init() // Changed the name for this DEL when u see
 {
     // TODO: Initialise spinlock
     // TODO: malloc space for 2^10 pagetable addresses ;; (RAMSIZE-FIRSTFREE) / PAGESIZE)
