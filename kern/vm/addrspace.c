@@ -48,6 +48,14 @@
  *
  */
 
+
+/*
+ create a new empty address space. 
+ 
+ You need to make sure this gets called in all the right places.  
+ You may find you want to change the argument list.  
+ May return NULL on out-of-memory error.
+*/
 struct addrspace *
 as_create(void)
 {
@@ -65,6 +73,11 @@ as_create(void)
 	return as;
 }
 
+/*
+ create a new address space that is an exact copy of an old one.  
+ 
+ Probably calls as_create to get a new empty address space and fill it in, but that's up to you.
+*/
 int
 as_copy(struct addrspace *old, struct addrspace **ret)
 {
@@ -85,16 +98,11 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	return 0;
 }
 
-void
-as_destroy(struct addrspace *as)
-{
-	/*
-	 * Clean up as needed.
-	 */
 
-	kfree(as);
-}
 
+/*
+ make curproc's address space the one currently "seen" by the processor.
+*/
 void
 as_activate(void)
 {
@@ -114,6 +122,11 @@ as_activate(void)
 	 */
 }
 
+/*
+ unload curproc's address space so it isn't currently "seen" by the processor. 
+  
+ This is used to avoid potentially "seeing" it while it's being destroyed.
+*/
 void
 as_deactivate(void)
 {
@@ -123,6 +136,26 @@ as_deactivate(void)
 	 * be needed.
 	 */
 }
+
+
+/*
+ dispose of an address space.  
+ 
+ You may need to change the way this works if implementing user-level threads.
+*/
+void
+as_destroy(struct addrspace *as)
+{
+	/*
+	 * Clean up as needed.
+	 */
+
+	kfree(as);
+}
+
+/*
+ set up a region of memory within the address space.
+*/
 
 /*
  * Set up a segment at virtual address VADDR of size MEMSIZE. The
@@ -151,6 +184,9 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 	return ENOSYS; /* Unimplemented */
 }
 
+/* 
+ this is called before actually loading from an executable into the address space.
+*/
 int
 as_prepare_load(struct addrspace *as)
 {
@@ -162,6 +198,9 @@ as_prepare_load(struct addrspace *as)
 	return 0;
 }
 
+/*
+ this is called when loading from an executable is complete.
+*/
 int
 as_complete_load(struct addrspace *as)
 {
@@ -173,6 +212,12 @@ as_complete_load(struct addrspace *as)
 	return 0;
 }
 
+/*
+ set up the stack region in the address space. 
+
+ Normally called *after* as_complete_load().  
+ Hands back the initial stack pointer for the new process.
+*/
 int
 as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 {
