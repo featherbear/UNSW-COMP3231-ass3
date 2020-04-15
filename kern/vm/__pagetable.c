@@ -69,18 +69,29 @@ int pagetable_translate(int32_t *address)
     // int index = (_address >>= 12) & 0x3FF; //
     // int table_index = (_address >>= 10) & 0x3FF;
 
-    // Do lookup
+    // Search for level 2 page table
     struct pagetable **pagetable_reference = &base_pagetable->entries[first_index];
+
+    PG_LOCK_ACQUIRE();
+    // Create level 2 pagetable if it does not exist
     if (*pagetable_reference == NULL)
     {
         *pagetable_reference = create_pagetable();
         kassert(*pagetable_reference != NULL);
     }
 
-    int *frame = &if (pagetable_reference)
+    // Search for frame index
+    int *frame = &((*pagetable_reference)->entries[second_index]);
 
-                 // return ((PAGE_SIZE * lookup) << 20) | offset;
-                 return 0;
+    // TODO: Assign frame if it does not exist???
+    if (*frame == NULL) // i.e. pagetable->entries[first_index]->entries[second_index] is null
+    {
+        (*pagetable_reference)->n_entries++;
+        // TODO: Assign a frame // *frame
+    }
+    PG_LOCK_RELEASE();
+
+    return ((PAGE_SIZE * *frame) << 20) | offset;
 }
 
 struct base_pagetable *base_pagetable = NULL;
@@ -93,7 +104,8 @@ int base_pagetable_init()
     if (base_pagetable != NULL)
         panic("base_pagetable_init called twice");
 
-    // TODO: Initialise spinlock
+    struct (*)spinlock base_pagetable_lock;
+    spinlock_init(&base_pagetable_lock);
 
     if ((base_pagetable = kmalloc(1024 * sizeof(struct pagetable))) == NULL)
     {
