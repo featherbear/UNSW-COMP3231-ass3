@@ -7,8 +7,6 @@
 #define PG_LOCK_ACQUIRE() (spinlock_acquire(&base_pagetable->lock))
 #define PG_LOCK_RELEASE() (spinlock_release(&base_pagetable->lock))
 
-#define PAGESIZE 1024 // FIXME: This is defined in vm.h; also it's 4096
-
 /* First level page table*/
 struct base_pagetable
 {
@@ -47,6 +45,9 @@ struct pagetable *create_pagetable()
     return pagetable;
 }
 
+/* 
+ * Translation from virtual address to physical address 
+ */
 int pagetable_translate(int32_t *address)
 {
     int32_t _address = (int32_t)address;
@@ -104,13 +105,18 @@ int base_pagetable_init()
     if (base_pagetable != NULL)
         panic("base_pagetable_init called twice");
 
-    struct (*)spinlock base_pagetable_lock;
-    spinlock_init(&base_pagetable_lock);
-
     if ((base_pagetable = kmalloc(1024 * sizeof(struct pagetable))) == NULL)
     {
-        return NULL;
+        return 1;
     }
+
+    struct *spinlock base_pagetable_lock = NULL;
+    spinlock_init(base_pagetable_lock);
+    if (base_pagetable = NULL)
+    {
+        return 1;
+    }
+    base_pagetable->lock = base_pagetable_lock;
 
     paddr_t highest_physical_addr = ram_getsize();
     paddr_t lowest_physical_addr = ram_getfirstfree();
@@ -118,8 +124,11 @@ int base_pagetable_init()
 
     if ((base_pagetable->entries = kmalloc(sizeof(struct pagetable) * n_entries)) == NULL)
     {
-        return NULL;
+        return 1;
     }
 
-    bzero(base_pagetable->entries, n_entries * sizeof(int));
+    bzero(base_pagetable->entries, n_entries * sizeof(struct pagetable));
+
+    // Success
+    return 0;
 }
