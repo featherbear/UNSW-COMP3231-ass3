@@ -1,6 +1,23 @@
 #include <__pagetable.h>
 #include <types.h>
 #include <vm.h>
+#include <spinlock.h>
+
+struct base_pagetable {
+    struct spinlock lock;
+    struct pagetable *pages;
+};
+
+struct pagetable {
+    int n_entries;
+    
+
+};
+
+struct pagetable *create_pagetable() {
+
+}
+
 
 int pagetable_translate(int32_t * address) {
     int32_t _address = (int32_t) address;
@@ -33,5 +50,8 @@ int pagetable_translate(int32_t * address) {
 }
 
 int pagetable_init() {
-    
+    // Initialise spinlock
+    // Malloc RAMSIZE-FIRSTFREE / PAGESIZE)pages
+
+
 }
