@@ -2,33 +2,45 @@
 #include <types.h>
 #include <vm.h>
 #include <spinlock.h>
+#include <lib.h>
+
+#define PAGESIZE 1024
 
 /* First level page table*/
 struct base_pagetable
 {
-    struct spinlock lock;
-    struct pagetable *entries; // Should this be an array of page tables
+    struct spinlock lock;      // Global spinlock for ALL page table and level 2 page table operations
+    struct pagetable *entries; // Array of page tables
 };
 
 /* Second level page table */
 struct pagetable
 {
     int n_entries;
-    // Shouldn't the page table have a spinlock too?
-    void *entries; // Should this be an array of entries
+    int *entries; // Should this be an array of entries
 };
 
+/*
+ * Creates a level 2 page table.
+ * 
+ * To be called when a page fault to a level 2 table occurs
+ */
 struct pagetable *create_pagetable()
 {
-    // TODO: initialise page table
-    struct pagetable *new = kmalloc(sizeof(struct pagetable));
-    if (new == NULL)
-        return EMEM;
+    struct pagetable *pagetable;
 
-    // rip if malloc returned null
-    // zero-fill
+    if ((pagetable = kmalloc(sizeof(struct pagetable))) == NULL)
+    {
+        return NULL;
+    }
 
-    // TODO: return new pagetable address
+    pagetable->n_entries = 0;
+
+    // Assign page table references
+    pagetable->entries = kmalloc(sizeof(/* 2^10 entries */ 1024 * sizeof(int)));
+    bzero(pagetable->entries, 1024 * sizeof(int));
+
+    return pagetable;
 }
 
 int pagetable_translate(int32_t *address)
@@ -58,8 +70,22 @@ int pagetable_translate(int32_t *address)
     return 0;
 }
 
-int base_pagetable_init() // Changed the name for this DEL when u see
+/* 
+ * Creates the first level page table. 
+ */
+int base_pagetable_init()
 {
+    struct base_pagetable *base_pagetable;
+    if ((base_pagetable = kmalloc(1024 * sizeof(struct pagetable))) == NULL)
+    {
+        return NULL;
+    }
+
+    paddr_t highest_physical_addr = ram_getsize(); // Within vm.h 
+    
+
+    // welp I remember nothing
+    // spinlock *base_pagetable_lock
     // TODO: Initialise spinlock
     // TODO: malloc space for 2^10 pagetable addresses ;; (RAMSIZE-FIRSTFREE) / PAGESIZE)
     // TODO: rip if malloc returned null
