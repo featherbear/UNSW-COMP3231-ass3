@@ -111,7 +111,7 @@ struct pagedirectory *pagedirectory_init()
 
     paddr_t highest_physical_addr = ram_getsize();
     paddr_t lowest_physical_addr = ram_getfirstfree();
-    unsigned int n_entries = (highest_physical_addr - lowest_physical_addr) / PAGESIZE;
+    unsigned int n_entries = (highest_physical_addr - lowest_physical_addr) / PAGE_SIZE;
 
     if ((pagedirectory->entries = kmalloc(sizeof(struct pagetable) * n_entries)) == NULL)
     {
@@ -121,7 +121,7 @@ struct pagedirectory *pagedirectory_init()
     bzero(pagedirectory->entries, n_entries * sizeof(struct pagetable));
 
     // Success
-    return 0;
+    return pagedirectory;
 }
 
 /*
