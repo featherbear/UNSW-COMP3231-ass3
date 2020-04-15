@@ -14,8 +14,13 @@ int pagetable_translate(int32_t * address) {
 
 
     // FIXME: Check for Kernel address?
+    
+    int page_number = (_address & PAGE_FRAME) >> 12;
+    int second_index = page_number & 0x3FF;
+    int first_index = (page_number >> 10) & 0x3FF;
+    int offset = _address & ~PAGE_FRAME;
 
-    int offset = _address PAGE_FRAME
+
     // int offset = _address & 0xFFF; // Last 12 bits
     // int index = (_address >>= 12) & 0x3FF; // 
     // int table_index = (_address >>= 10) & 0x3FF;
@@ -25,4 +30,8 @@ int pagetable_translate(int32_t * address) {
 
     // return (lookup << 20) | offset;
     return 0;
+}
+
+int pagetable_init() {
+    
 }
