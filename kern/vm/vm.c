@@ -54,7 +54,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                 panic("???");
             }
 
-            as->
+            as->regions->
 
 
             tlb_random(faultaddress & PAGE_FRAME, 
