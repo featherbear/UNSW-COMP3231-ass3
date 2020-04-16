@@ -40,7 +40,7 @@ paddr_t *pagetable_lookup(vaddr_t *address)
 }
 
 paddr_t *pagetable_lookup_tableref(vaddr_t *address, struct pagetable** tableref) {
- vaddr_t _address = (vaddr_t)address;
+    vaddr_t _address = (vaddr_t)address;
 
     // VIRTUAL_MEMORY_ADDRESS
     //   |       |       \ 
