@@ -64,8 +64,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                 //   1 bit - Global (ignore for OS161 (FIXME: ???))
                 
                 // RWX -> DV conversion
-                // [Any] -> V
                 // W -> D
+                // [Any] -> V
                 
                 tlb_random(faultaddress & PAGE_FRAME, 
                 (*frameRef & PAGE_FRAME) 
