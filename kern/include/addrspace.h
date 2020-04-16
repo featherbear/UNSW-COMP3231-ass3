@@ -37,6 +37,7 @@
 
 #include <vm.h>
 #include "opt-dumbvm.h"
+#include <__pagetable.h>
 
 struct vnode;
 
@@ -59,6 +60,7 @@ struct addrspace {
         paddr_t as_stackpbase;
 #else
         /* Put stuff here for your VM system */
+        struct pagedirectory pagedirectory;
 #endif
 };
 

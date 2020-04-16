@@ -1,25 +1,12 @@
 #include <__pagetable.h>
 #include <types.h>
 #include <vm.h>
-#include <spinlock.h>
 #include <lib.h>
 
 #define PG_LOCK_ACQUIRE() (spinlock_acquire(&pagedirectory->lock))
 #define PG_LOCK_RELEASE() (spinlock_release(&pagedirectory->lock))
 
-/* Page directory */
-struct pagedirectory
-{
-    struct spinlock lock;      // Global spinlock for ALL page table and level 2 page table operations
-    struct pagetable *entries; // Array of page tables
-};
 
-/* Second level page table */
-struct pagetable
-{
-    int n_entries;
-    int *entries; // Should this be an array of entries
-};
 
 /*
  * Creates a level 2 page table.
