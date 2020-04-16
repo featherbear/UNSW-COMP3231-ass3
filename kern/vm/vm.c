@@ -26,11 +26,14 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
     panic("vm_fault hasn't been written yet\n");
 
-
-//#define VM_FAULT_READ        0    /* A read was attempted */
-//#define VM_FAULT_WRITE       1    /* A write was attempted */
-//#define VM_FAULT_READONLY    2    /* A write to a readonly page was attempted*/
-
+    switch (faulttype) {
+        case VM_FAULT_READONLY:
+            break;
+        case VM_FAULT_READ:
+            break;
+        case VM_FAULT_WRITE:
+            break;
+    }
 
     return EFAULT;
 }

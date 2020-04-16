@@ -89,36 +89,27 @@ struct pagedirectory *pagedirectory_init()
 {
     struct pagedirectory *pagedirectory = NULL;
 
-    if ((pagedirectory = kmalloc(sizeof(struct pagetable))) == NULL)
+    if ((pagedirectory = kmalloc(sizeof(struct pagedirectory))) == NULL)
     {
         return NULL;
     }
 
     spinlock_init(&pagedirectory->lock);
 
-    paddr_t highest_physical_addr = ram_getsize();
-    paddr_t lowest_physical_addr = ram_getfirstfree();
-    unsigned int n_entries = (highest_physical_addr - lowest_physical_addr) / PAGE_SIZE;
 
-    if ((pagedirectory->entries = kmalloc(sizeof(struct pagetable) * n_entries)) == NULL)
+    // FIXME: Don't need this - it's already implemented in unsw.c
+    // paddr_t highest_physical_addr = ram_getsize();
+    // paddr_t lowest_physical_addr = ram_getfirstfree();
+    // unsigned int n_entries = (highest_physical_addr - lowest_physical_addr) / PAGE_SIZE;
+
+    if ((pagedirectory->entries = kmalloc(1024 * sizeof(struct pagetable *))) == NULL)
     {
-        return 1;
+        spinlock_cleanup(&pagedirectory->lock);
+        return NULL;
     }
 
-    bzero(pagedirectory->entries, n_entries * sizeof(struct pagetable));
+    bzero(pagedirectory->entries, 1024 * sizeof(struct pagetable *));
 
     // Success
     return pagedirectory;
 }
-
-/*
-
-Jennifer's Thought Bubble
-
-try {
-    do (bubble.grow()) while true;
-} catch {
-    bubble.pop();
-}
-
-*/
