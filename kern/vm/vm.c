@@ -44,6 +44,12 @@ vm_fault(int faulttype, vaddr_t faultaddress)
             //  1 bit - Dirty -> Check value set from define address space
             //  1 bit - Valid  
             //  1 bit - Global
+
+            // TODO: Step through as->regions->head     ->next     ->next    ->next etc
+            // until we find the matching region
+            // then compare RWX againt DV
+            TBLO_VALID  region->readable || region->writeable || region->executable
+
             tlb_random(faultaddress & PAGE_FRAME, (*frameRef & PAGE_FRAME) | TLBLO_DIRTY | TLBLO_VALID /* TODO: FIXME */);
 
             // On successful allocation, return 0            

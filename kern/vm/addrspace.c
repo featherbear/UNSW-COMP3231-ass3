@@ -190,8 +190,6 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 {
 	// TODO: Check for if as is null!?
 
-	(void)as;
-
 	struct region *region;
 	if ((region = kmalloc(sizeof(struct region))) == NULL) {
 		panic("welp.");
@@ -212,14 +210,21 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 	};
 
 	*region_node = (struct region_node) {
-		.value = NULL,
+		.value = region,
 		.next = NULL
 	}
 
-
+	if (as->regions->head) {
+		if (as->regions->tail) {
+			as->regions->tail->next = region_node;
+			as->regions->tail = region_node;
+		}
+	} else {
+		as->regions->head = as->regions->tail = region_node;
+	}
 	
-
-
+	// FIXME: Return code
+	return 0;
 }
 
 /* 
