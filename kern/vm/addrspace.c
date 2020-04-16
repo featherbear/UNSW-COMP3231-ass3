@@ -188,7 +188,7 @@ int
 as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 		 int readable, int writeable, int executable)
 {
-	// TODO: Check for if as is null!?
+	// TODO: Check if as is null!?
 
 	struct region *region;
 	if ((region = kmalloc(sizeof(struct region))) == NULL) {
