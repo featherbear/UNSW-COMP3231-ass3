@@ -34,12 +34,12 @@ struct pagetable *create_pagetable()
 /* 
  * Translation from virtual address to physical address 
  */
-int *pagetable_lookup(vaddr_t *address)
+paddr_t *pagetable_lookup(vaddr_t *address)
 {
    return pagetable_lookup_tableref(address, NULL);
 }
 
-int *pagetable_lookup_tableref(vaddr_t *address, struct pagetable** tableref) {
+paddr_t *pagetable_lookup_tableref(vaddr_t *address, struct pagetable** tableref) {
  vaddr_t _address = (vaddr_t)address;
 
     // VIRTUAL_MEMORY_ADDRESS

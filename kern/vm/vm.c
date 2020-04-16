@@ -28,14 +28,34 @@ vm_fault(int faulttype, vaddr_t faultaddress)
         case VM_FAULT_WRITE:
 
             int *frameRef = pagetable_lookup(faultaddress);
-            
-            alloc_kpages(1)
-            
-            if (*frame)
+
+            if (*frameRef == NULL) {
+                // Does not exist in the Page Table
+                alloc_kpages(1);
+            }
+
+
+
+    
+            // On successful allocation, return 0
+            // EntryHi: 
+            //   20 bits - VPN
+            //   6 bits - ASID (ignore for OS161)  
+            //   6 bits - 000000
+            // EntryLo: 
+            //  20 bits - PFN
+            //  1 bit - Non-Cacheable (ignore for OS161)  
+            //  1 bit - Dirty,  
+            //  1 bit - Valid,  
+            //  1 bit - Global
+
+            tlb_random(faultaddress & PAGE_FRAME, 0 /* TODO: FIXME */);
+            return 0;
+
             break;
     }
 
-    // On successful allocation, return 0
+    
 
     return EFAULT;
 }

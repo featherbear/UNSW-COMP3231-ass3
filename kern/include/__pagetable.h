@@ -16,10 +16,10 @@ struct pagedirectory
 struct pagetable
 {
     int n_entries;
-    int entries[];
+    paddr_t entries[];
 };
 
-int *pagetable_lookup(vaddr_t *address);
+paddr_t *pagetable_lookup(vaddr_t *address);
 int pagetable_set(vaddr_t *address, int frame_no);
 
 
