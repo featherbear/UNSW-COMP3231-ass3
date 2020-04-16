@@ -58,32 +58,6 @@ void __clear_tlb() {
 	splx(spl);
 }
 
-struct __linkedlist {
-    void *value;
-    struct __linkedlist* next;
-}
-
-void __linkedlist_create(void *value) {
-    struct __linkedlist *__ll = kmalloc(sizeof(struct __linkedlist));
-    __ll->value = value;
-    __ll->next = NULL;
-}
-
-void __linkedlist_append(void** ref) {
-    if (*ref == NULL) {
-        *ref = 
-    }
-}
-void* __linkedlist_value(struct __linkedlist *node) {
-    return node->value;
-}
-
-struct __linkedlist* __linkedlist_peek_next(struct __linkedlist *node) {
-    return node->next;
-}
-
-
-
 /*
  create a new empty address space. 
  
@@ -104,6 +78,11 @@ as_create(void)
 	// TODO: Initialise our addrspace struct
 	
 	as->pagedirectory = pagedirectory_init();
+	as->regions = (struct region_container) {
+		.head = NULL,
+		.tail = NULL
+	};
+
 	/*
 	 * Initialize as needed.
 	 */
@@ -209,17 +188,38 @@ int
 as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 		 int readable, int writeable, int executable)
 {
-	/*
-	 * Write this.
-	 */
+	// TODO: Check for if as is null!?
 
 	(void)as;
-	(void)vaddr;
-	(void)memsize;
-	(void)readable;
-	(void)writeable;
-	(void)executable;
-	return ENOSYS; /* Unimplemented */
+
+	struct region *region;
+	if ((region = kmalloc(sizeof(struct region))) == NULL) {
+		panic("welp.");
+	}
+
+	*region = (struct region) {
+		.vaddr = vaddr,
+		.memsize = memsize,
+		.readable = readable,
+		.writeable = writeable,
+		.executable = executable,
+	};
+
+
+	struct region_node *region_node;
+	if ((region_node = kmalloc(sizeof(struct region_node))) == NULL) {
+		panic("welp.");
+	};
+
+	*region_node = (struct region_node) {
+		.value = NULL,
+		.next = NULL
+	}
+
+
+	
+
+
 }
 
 /* 

@@ -65,17 +65,24 @@ struct addrspace {
 #endif
 };
 
+
 struct region_container {
         // Linked list
-        struct region *head;
-        struct region *tail;
+        struct region_node *head;
+        struct region_node *tail;
+};
 
-        
-        // flags
+struct region_node {
+        struct region *value;
+        struct region_node *next;
 };
 
 struct region {
-        size_t size;
+        vaddr_t vaddr;
+        size_t memsize;
+        unsigned readable:1;
+        unsigned writeable:1;
+        unsigned executable:1;
 }
 /*
  * Functions in addrspace.c:
