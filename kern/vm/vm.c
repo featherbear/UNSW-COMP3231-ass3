@@ -23,7 +23,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 {
     switch (faulttype) {
         case VM_FAULT_READONLY:
-            break;
+            return EFAULT;
         case VM_FAULT_READ:
         case VM_FAULT_WRITE:
 
@@ -31,13 +31,9 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
             if (*frameRef == NULL) {
                 // Does not exist in the Page Table
-                alloc_kpages(1);
+                *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));
             }
 
-
-
-    
-            // On successful allocation, return 0
             // EntryHi: 
             //   20 bits - VPN
             //   6 bits - ASID (ignore for OS161)  
@@ -48,11 +44,12 @@ vm_fault(int faulttype, vaddr_t faultaddress)
             //  1 bit - Dirty,  
             //  1 bit - Valid,  
             //  1 bit - Global
+            tlb_random(faultaddress & PAGE_FRAME, (*frameRef & PAGE_FRAME) | TLBLO_DIRTY | TLBLO_VALID /* TODO: FIXME */);
 
-            tlb_random(faultaddress & PAGE_FRAME, 0 /* TODO: FIXME */);
+            // On successful allocation, return 0            
             return 0;
-
-            break;
+        default:
+            return EINVAL;
     }
 
     
