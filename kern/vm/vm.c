@@ -26,22 +26,23 @@ vm_fault(int faulttype, vaddr_t faultaddress)
             return EFAULT;
         case VM_FAULT_READ:
         case VM_FAULT_WRITE:
-
-          
-
-            // TODO: Step through as->regions->head     ->next     ->next    ->next etc
-            // until we find the matching region
-            // then compare RWX againt DV
             
             struct addrspace *as;
             if ((as = proc_getas()) == NULL) {
                 panic("???");
             }
 
+            // Step through the regions until we find the matching region
             struct region_node *node = as->regions->head;
+
             while (*node != NULL) {
                 struct region *region = node->value;
-                if (region->vaddr <= faultaddress && faultaddress < (region->vaddr + region->memsize)) {
+
+                // Check if region contains the fault address
+                if (region->vaddr > faultaddress || faultaddress >= (region->vaddr + region->memsize)) {
+                    node = node->next;
+                    continue;
+                }
 
                 int *frameRef = pagetable_lookup(faultaddress);
 
@@ -55,24 +56,26 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                 //   6 bits - ASID (ignore for OS161)  
                 //   6 bits - 000000
                 // EntryLo: 
-                //  20 bits - PFN
-                //  1 bit - Non-Cacheable (ignore for OS161)  
-                //  1 bit - Dirty -> Check value set from define address space
-                //  1 bit - Valid  
-                //  1 bit - Global
+                //   20 bits - PFN
+                //   1 bit - Non-Cacheable (ignore for OS161)  
+                //   1 bit - Dirty -> Check value set from define address space
+                //   1 bit - Valid  
+                //   1 bit - Global (ignore for OS161 (FIXME: ???))
                 
-                    tlb_random(faultaddress & PAGE_FRAME, 
-                    (*frameRef & PAGE_FRAME) 
-                    | (region->writeable ? TLBLO_DIRTY : 0) 
-                    | ((region->readable || region->writeable || region->executable) ? TBLO_VALID : 0) );
+                // RWX -> DV conversion
+                // [Any] -> V
+                // W -> D
+                
+                tlb_random(faultaddress & PAGE_FRAME, 
+                (*frameRef & PAGE_FRAME) 
+                | (region->writeable ? TLBLO_DIRTY : 0) 
+                | ((region->readable || region->writeable || region->executable) ? TLBLO_VALID : 0) );
 
-                    return 0;
-                }
-
-                node = node->next;
+                return 0;
             }
 
             return EFAULT;
+
             
         default:
             return EINVAL;
