@@ -44,10 +44,11 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                     continue;
                 }
 
+                // Get the addres holding the frame pointer
                 int *frameRef = pagetable_lookup(faultaddress);
 
+                // If the frame pointer is null, then it does not exist in the page table
                 if (*frameRef == NULL) {
-                    // Does not exist in the Page Table
                     *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));
                 }
 
@@ -76,7 +77,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
             return EFAULT;
 
-            
         default:
             return EINVAL;
     }
