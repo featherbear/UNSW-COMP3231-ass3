@@ -35,7 +35,7 @@ struct pagetable *create_pagetable()
 /* 
  * Translation from virtual address to physical address 
  */
-int pagetable_translate(int32_t *address)
+int *pagetable_translate(int32_t *address)
 {
     int32_t _address = (int32_t)address;
 
@@ -68,20 +68,27 @@ int pagetable_translate(int32_t *address)
         kassert(*pagetable_reference != NULL);
     }
 
-    // Search for frame index
-    int *frame = &((*pagetable_reference)->entries[second_index]);
-
-    // TODO: Assign frame if it does not exist???
-    if (*frame == NULL) // i.e. pagetable->entries[first_index]->entries[second_index] is null
-    {
-        (*pagetable_reference)->n_entries++;
-        // TODO: Assign a frame // *frame
-    }
     PG_LOCK_RELEASE();
 
-    return ((PAGE_SIZE * *frame) << 20) | offset;
+    // Return pointer to frame value. May be null (in the event of frame not allocated)    
+    return &((*pagetable_reference)->entries[second_index]);
+
+    // // TODO: Assign frame if it does not exist???
+    // if (*frame == NULL) // i.e. pagetable->entries[first_index]->entries[second_index] is null
+    // {
+    //     (*pagetable_reference)->n_entries++;
+    //     // TODO: Assign a frame // *frame
+    // }
+
+    // return ((PAGE_SIZE * *frame) << 20) | offset;
 }
 
+int pagetable_set(int32_t *address, int_t frame_no) {
+    int *frame_reference = pagetable_translate(address);
+    if (*frame_reference == NULL) {
+        
+    }
+}
 /* 
  * Creates the first level page table. 
  */

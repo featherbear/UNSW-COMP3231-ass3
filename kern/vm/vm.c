@@ -30,10 +30,13 @@ vm_fault(int faulttype, vaddr_t faultaddress)
         case VM_FAULT_READONLY:
             break;
         case VM_FAULT_READ:
-            break;
         case VM_FAULT_WRITE:
+
+            
             break;
     }
+
+    // On successful allocation, return 0
 
     return EFAULT;
 }
