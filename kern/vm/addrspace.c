@@ -48,6 +48,17 @@
  *
  */
 
+/* */
+
+void __clear_tlb() {
+	int spl = splhigh();
+	for (int i = 0; i < 64; i++) {
+		tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
+	}
+	splx(spl);
+}
+
+/* */
 
 /*
  create a new empty address space. 
