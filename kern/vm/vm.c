@@ -48,9 +48,19 @@ vm_fault(int faulttype, vaddr_t faultaddress)
             // TODO: Step through as->regions->head     ->next     ->next    ->next etc
             // until we find the matching region
             // then compare RWX againt DV
-            TBLO_VALID  region->readable || region->writeable || region->executable
+            
+            struct addrspace *as;
+            if ((as = proc_getas()) == NULL) {
+                panic("???");
+            }
 
-            tlb_random(faultaddress & PAGE_FRAME, (*frameRef & PAGE_FRAME) | TLBLO_DIRTY | TLBLO_VALID /* TODO: FIXME */);
+            as->
+
+
+            tlb_random(faultaddress & PAGE_FRAME, 
+            (*frameRef & PAGE_FRAME) 
+            | (region->writeable ? TLBLO_DIRTY : 0) 
+            | ((region->readable || region->writeable || region->executable) ? TBLO_VALID : 0) );
 
             // On successful allocation, return 0            
             return 0;
