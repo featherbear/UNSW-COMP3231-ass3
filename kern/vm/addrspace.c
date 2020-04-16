@@ -77,6 +77,9 @@ as_create(void)
 		return NULL;
 	}
 
+	// TODO: Initialise our addrspace struct
+	
+	as->pagedirectory = pagedirectory_init();
 	/*
 	 * Initialize as needed.
 	 */

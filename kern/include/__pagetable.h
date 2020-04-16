@@ -1,5 +1,5 @@
-#ifndef _PAGETABLE_H_
-#define _PAGETABLE_H_
+#ifndef ___PAGETABLE_H_
+#define ___PAGETABLE_H_
 
 #include <types.h>
 #include <spinlock.h>
@@ -23,4 +23,4 @@ paddr_t *pagetable_lookup(vaddr_t *address);
 int pagetable_set(vaddr_t *address, int frame_no);
 
 
-#endif /* _PAGETABLE_H_ */
+#endif /* ___PAGETABLE_H_ */

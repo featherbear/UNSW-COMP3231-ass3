@@ -64,6 +64,11 @@ struct addrspace {
 #endif
 };
 
+struct region {
+        size_t size;
+        // flags
+};
+
 /*
  * Functions in addrspace.c:
  *

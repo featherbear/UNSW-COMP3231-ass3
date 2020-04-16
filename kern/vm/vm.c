@@ -41,8 +41,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
             // EntryLo: 
             //  20 bits - PFN
             //  1 bit - Non-Cacheable (ignore for OS161)  
-            //  1 bit - Dirty,  
-            //  1 bit - Valid,  
+            //  1 bit - Dirty -> Check value set from define address space
+            //  1 bit - Valid  
             //  1 bit - Global
             tlb_random(faultaddress & PAGE_FRAME, (*frameRef & PAGE_FRAME) | TLBLO_DIRTY | TLBLO_VALID /* TODO: FIXME */);
 
