@@ -58,7 +58,31 @@ void __clear_tlb() {
 	splx(spl);
 }
 
-/* */
+struct __linkedlist {
+    void *value;
+    struct __linkedlist* next;
+}
+
+void __linkedlist_create(void *value) {
+    struct __linkedlist *__ll = kmalloc(sizeof(struct __linkedlist));
+    __ll->value = value;
+    __ll->next = NULL;
+}
+
+void __linkedlist_append(void** ref) {
+    if (*ref == NULL) {
+        *ref = 
+    }
+}
+void* __linkedlist_value(struct __linkedlist *node) {
+    return node->value;
+}
+
+struct __linkedlist* __linkedlist_peek_next(struct __linkedlist *node) {
+    return node->next;
+}
+
+
 
 /*
  create a new empty address space. 

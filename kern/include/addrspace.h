@@ -60,15 +60,23 @@ struct addrspace {
         paddr_t as_stackpbase;
 #else
         /* Put stuff here for your VM system */
-        struct pagedirectory pagedirectory;
+        struct pagedirectory *pagedirectory;
+        struct region_container regions; // Linked list
 #endif
+};
+
+struct region_container {
+        // Linked list
+        struct region *head;
+        struct region *tail;
+
+        
+        // flags
 };
 
 struct region {
         size_t size;
-        // flags
-};
-
+}
 /*
  * Functions in addrspace.c:
  *
