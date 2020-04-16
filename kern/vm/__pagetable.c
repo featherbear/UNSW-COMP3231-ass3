@@ -1,5 +1,4 @@
 #include <__pagetable.h>
-#include <types.h>
 #include <vm.h>
 #include <lib.h>
 
@@ -35,9 +34,13 @@ struct pagetable *create_pagetable()
 /* 
  * Translation from virtual address to physical address 
  */
-int *pagetable_translate(int32_t *address)
+int *pagetable_lookup(vaddr_t *address)
 {
-    int32_t _address = (int32_t)address;
+   return pagetable_lookup_tableref(address, NULL);
+}
+
+int *pagetable_lookup_tableref(vaddr_t *address, struct pagetable** tableref) {
+ vaddr_t _address = (vaddr_t)address;
 
     // VIRTUAL_MEMORY_ADDRESS
     //   |       |       \ 
@@ -68,6 +71,9 @@ int *pagetable_translate(int32_t *address)
         kassert(*pagetable_reference != NULL);
     }
 
+    if (tableref != NULL) {
+        *tableref = *pagetable_reference;
+    }
     PG_LOCK_RELEASE();
 
     // Return pointer to frame value. May be null (in the event of frame not allocated)    
@@ -83,11 +89,16 @@ int *pagetable_translate(int32_t *address)
     // return ((PAGE_SIZE * *frame) << 20) | offset;
 }
 
-int pagetable_set(int32_t *address, int_t frame_no) {
-    int *frame_reference = pagetable_translate(address);
+int pagetable_set(vaddr_t *address, int frame_no) {
+    struct pagetable *table = NULL;
+    int *frame_reference = pagetable_lookup_tableref(address, &table);
+    PG_LOCK_ACQUIRE();
     if (*frame_reference == NULL) {
-        
+        table->n_entries++;
     }
+    PG_LOCK_RELEASE();
+
+    *frame_reference = frame_no;
 }
 /* 
  * Creates the first level page table. 

@@ -1,6 +1,7 @@
 #ifndef _PAGETABLE_H_
 #define _PAGETABLE_H_
 
+#include <types.h>
 #include <spinlock.h>
 
 
@@ -17,5 +18,9 @@ struct pagetable
     int n_entries;
     int entries[];
 };
+
+int *pagetable_lookup(vaddr_t *address);
+int pagetable_set(vaddr_t *address, int frame_no);
+
 
 #endif /* _PAGETABLE_H_ */

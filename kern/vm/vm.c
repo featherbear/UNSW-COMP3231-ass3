@@ -21,18 +21,17 @@ void vm_bootstrap(void)
 int
 vm_fault(int faulttype, vaddr_t faultaddress)
 {
-    (void) faulttype;
-    (void) faultaddress;
-
-    panic("vm_fault hasn't been written yet\n");
-
     switch (faulttype) {
         case VM_FAULT_READONLY:
             break;
         case VM_FAULT_READ:
         case VM_FAULT_WRITE:
 
+            int *frameRef = pagetable_lookup(faultaddress);
             
+            alloc_kpages(1)
+            
+            if (*frame)
             break;
     }
 
