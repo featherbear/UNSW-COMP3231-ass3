@@ -27,23 +27,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
         case VM_FAULT_READ:
         case VM_FAULT_WRITE:
 
-            int *frameRef = pagetable_lookup(faultaddress);
-
-            if (*frameRef == NULL) {
-                // Does not exist in the Page Table
-                *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));
-            }
-
-            // EntryHi: 
-            //   20 bits - VPN
-            //   6 bits - ASID (ignore for OS161)  
-            //   6 bits - 000000
-            // EntryLo: 
-            //  20 bits - PFN
-            //  1 bit - Non-Cacheable (ignore for OS161)  
-            //  1 bit - Dirty -> Check value set from define address space
-            //  1 bit - Valid  
-            //  1 bit - Global
+          
 
             // TODO: Step through as->regions->head     ->next     ->next    ->next etc
             // until we find the matching region
@@ -54,21 +38,45 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                 panic("???");
             }
 
-            as->regions->
+            struct region_node *node = as->regions->head;
+            while (*node != NULL) {
+                struct region *region = node->value;
+                if (region->vaddr <= faultaddress && faultaddress < (region->vaddr + region->memsize)) {
 
+                int *frameRef = pagetable_lookup(faultaddress);
 
-            tlb_random(faultaddress & PAGE_FRAME, 
-            (*frameRef & PAGE_FRAME) 
-            | (region->writeable ? TLBLO_DIRTY : 0) 
-            | ((region->readable || region->writeable || region->executable) ? TBLO_VALID : 0) );
+                if (*frameRef == NULL) {
+                    // Does not exist in the Page Table
+                    *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));
+                }
 
-            // On successful allocation, return 0            
-            return 0;
+                // EntryHi: 
+                //   20 bits - VPN
+                //   6 bits - ASID (ignore for OS161)  
+                //   6 bits - 000000
+                // EntryLo: 
+                //  20 bits - PFN
+                //  1 bit - Non-Cacheable (ignore for OS161)  
+                //  1 bit - Dirty -> Check value set from define address space
+                //  1 bit - Valid  
+                //  1 bit - Global
+                
+                    tlb_random(faultaddress & PAGE_FRAME, 
+                    (*frameRef & PAGE_FRAME) 
+                    | (region->writeable ? TLBLO_DIRTY : 0) 
+                    | ((region->readable || region->writeable || region->executable) ? TBLO_VALID : 0) );
+
+                    return 0;
+                }
+
+                node = node->next;
+            }
+
+            return EFAULT;
+            
         default:
             return EINVAL;
     }
-
-    
 
     return EFAULT;
 }
