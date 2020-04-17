@@ -69,6 +69,7 @@ as_create(void)
 	}
 
 	as->pagedirectory = pagedirectory_init();
+	kprintf("\npagedirectory set to 0x%08x\n", (int) as->pagedirectory);
 	as->regions = (struct region_container) {
 		.head = NULL,
 		.tail = NULL

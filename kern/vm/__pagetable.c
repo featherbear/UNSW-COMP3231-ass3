@@ -42,6 +42,10 @@ paddr_t* pagetable_lookup(vaddr_t address)
 }
 
 paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) {
+    kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("Lookup 0x%08x", address);
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+
     struct pagedirectory *pagedirectory = proc_getas()->pagedirectory;
     /*
      VIRTUAL_MEMORY_ADDRESS
@@ -57,6 +61,8 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
     int second_index = page_number & 0x3FF;
     int first_index = (page_number >> 10) & 0x3FF;
 
+	kprintf("\nBits split\n");
+
     // int offset = address & ~PAGE_FRAME;
 
     // int offset = _address & 0xFFF; // Last 12 bits
@@ -66,19 +72,28 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
     // Search for level 2 page table
     struct pagetable **pagetable_reference = &pagedirectory->entries[first_index];
 
+	kprintf("\nCheck level 2\n");
+
     PG_LOCK_ACQUIRE();
     // Create level 2 pagetable if it does not exist
     if (*pagetable_reference == NULL)
     {
+        kprintf("\nWill create\n");
         *pagetable_reference = create_pagetable();
+        kprintf("\nDo assert\n");
         KASSERT(*pagetable_reference != NULL);
+        kprintf("\nAssert pass: 0x%08x\n", (paddr_t ) *pagetable_reference);
     }
 
     if (tableref != NULL) {
+        kprintf("\nAssign reference\n");
         *tableref = *pagetable_reference;
     }
+    kprintf("\nReleasing\n");
+    kprintf("\n proc_getas(): 0x%08x\n", (vaddr_t) proc_getas()->pagedirectory); //->pagedirectory->lock
     PG_LOCK_RELEASE();
 
+    kprintf("\nReturn\n");
     // Return pointer to frame value. May be null (in the event of frame not allocated)    
     return &((*pagetable_reference)->entries[second_index]);
 

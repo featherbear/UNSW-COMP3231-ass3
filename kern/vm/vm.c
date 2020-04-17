@@ -53,10 +53,11 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                     // Get the addres holding the frame pointer
                     paddr_t *frameRef = pagetable_lookup(faultaddress);
 
+                    kprintf("frameRef at 0x%08x points to 0x%08x\n", (vaddr_t) frameRef,*frameRef);
                     // If the frame pointer is null, then it does not exist in the page table
                     if (*frameRef == (paddr_t) NULL) {
                         *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));
-                        kprintf("Allocated page 0x%08x\n", *frameRef);
+                        kprintf("Allocated new page 0x%08x\n", *frameRef);
                     }
 
                     // EntryHi: 
