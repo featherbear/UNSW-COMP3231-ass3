@@ -128,14 +128,6 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 			memcpy(entry->entries, old_entries[i]->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
 
 			entry->n_entries = old_entries[i]->n_entries;
-
-			for (int j = 0; j < PAGE_ENTRY_LIMIT; j++) {
-				if (entry->entries[j] != (paddr_t) NULL) {
-					kprintf("CHECK: Frame found at [%d][%d] -> 0x%08x\n", i, j, entry->entries[j]);
-				}
-			}
-
-
 			new_entries[i] = entry;
 		}
 	}
@@ -291,10 +283,6 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 		as->regions.head = as->regions.tail = region_node;
 	}
 	
-	// FIXME: REMOVE
-	kprintf("Region for AS %p assigned from 0x%08x to 0x%08x as %s%s%s\n", as, vaddr, vaddr+memsize-1, readable ? "r" : "-",  writeable ? "w" : "-",  executable ? "x" : "-" );
-
-	// FIXME: Return code
 	return 0;
 }
 
