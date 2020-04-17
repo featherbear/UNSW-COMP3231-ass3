@@ -130,6 +130,10 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 		region_node = region_node->next;
 	}
 
+	// FIXME: Remove
+	// kprintf("Created `as = 0x%08x`\n", (vaddr_t) new_as);
+	// FIXME: Remove
+
 	*ret = new_as;
 	return 0;
 }
@@ -256,9 +260,7 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 	}
 	
 	// FIXME: REMOVE
-	kprintf("Region assigned from 0x%08x to 0x%08x as %s%s%s\n", 
-	vaddr, vaddr+memsize-1, readable ? "r" : "-",  writeable ? "w" : "-",  executable ? "x" : "-"
-	);
+	// kprintf("Region assigned from 0x%08x to 0x%08x as %s%s%s\n", vaddr, vaddr+memsize-1, readable ? "r" : "-",  writeable ? "w" : "-",  executable ? "x" : "-" );
 
 	// FIXME: Return code
 	return 0;

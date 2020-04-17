@@ -20,7 +20,7 @@ struct pagetable
 };
 
 paddr_t* pagetable_lookup(vaddr_t);
-int pagetable_set(vaddr_t, paddr_t);
+// int pagetable_set(vaddr_t, paddr_t);
 struct pagedirectory *pagedirectory_init(void);
 void pagedirectory_cleanup(struct pagedirectory *);
 

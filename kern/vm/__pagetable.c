@@ -93,20 +93,21 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
 
 }
 
-int pagetable_set(vaddr_t address, paddr_t addr) {
-    struct pagetable *table = NULL;
-    paddr_t *frame_reference = pagetable_lookup_tableref(address, &table);
+// int pagetable_set(vaddr_t address, paddr_t addr) {
+//     struct pagetable *table = NULL;
+//     paddr_t *frame_reference = pagetable_lookup_tableref(address, &table);
 
-    PG_LOCK_ACQUIRE();
-    if (*frame_reference == (paddr_t) NULL) {
-        table->n_entries++;
-    }
-    PG_LOCK_RELEASE();
+//     PG_LOCK_ACQUIRE();
+//     if (*frame_reference == (paddr_t) NULL) {
+//         table->n_entries++;
+//     }
+//     PG_LOCK_RELEASE();
 
-    *frame_reference = addr;
+//     *frame_reference = addr;
 
-    return 0;
-}
+//     return 0;
+// }
+
 /* 
  * Creates the first level page table. 
  */
@@ -141,7 +142,7 @@ void pagedirectory_cleanup(struct pagedirectory *pagedirectory) {
             kfree(pagedirectory->entries[i]);
         }
     }
-    
+
     kfree(pagedirectory->entries);
     kfree(pagedirectory);
 }

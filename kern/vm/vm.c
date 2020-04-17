@@ -23,20 +23,21 @@ void vm_bootstrap(void)
 int
 vm_fault(int faulttype, vaddr_t faultaddress)
 {
+
+    // If null pointer reference then... yeah..
+    if (faultaddress == (vaddr_t) NULL) {
+        return EFAULT;
+    }
+
     switch (faulttype) {
         case VM_FAULT_READONLY:
             return EFAULT;
         case VM_FAULT_READ:
         case VM_FAULT_WRITE:
             {
-
-                if (faultaddress == (vaddr_t) NULL) {
-                    return EFAULT;
-                }
-
                 struct addrspace *as;
                 if ((as = proc_getas()) == NULL) {
-                    panic("???");
+                    return EFAULT;
                 }
 
                 // Step through the regions until we find the matching region
