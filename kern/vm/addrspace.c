@@ -69,7 +69,6 @@ as_create(void)
 	}
 
 	as->pagedirectory = pagedirectory_init();
-	kprintf("\npagedirectory set to 0x%08x\n", (int) as->pagedirectory);
 	as->regions = (struct region_container) {
 		.head = NULL,
 		.tail = NULL
@@ -80,6 +79,7 @@ as_create(void)
 	 */
 	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	kprintf("Address Space: %p", as);
+	kprintf("\nPage Directory set to 0x%08x\n", (int) as->pagedirectory);
 	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	return as;
 }

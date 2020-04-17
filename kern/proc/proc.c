@@ -472,7 +472,8 @@ proc_getas(void)
  */
 struct addrspace *
 proc_setas(struct addrspace *newas)
-{
+{	
+	kprintf("\n CHANGING ADDRESS SPACE to 0x%08x || 0x%08x \n", (int) newas, (int) newas->pagedirectory);
 	struct addrspace *oldas;
 	struct proc *proc = curproc;
 

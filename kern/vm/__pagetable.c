@@ -90,7 +90,7 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
         *tableref = *pagetable_reference;
     }
     kprintf("\nReleasing\n");
-    kprintf("\n proc_getas(): 0x%08x\n", (vaddr_t) proc_getas()->pagedirectory); //->pagedirectory->lock
+    kprintf("\n proc_getas():: 0x%08x\n", (int) proc_getas()->pagedirectory); //->pagedirectory->lock
     PG_LOCK_RELEASE();
 
     kprintf("\nReturn\n");
