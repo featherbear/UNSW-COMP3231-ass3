@@ -165,8 +165,11 @@ as_destroy(struct addrspace *as)
 {
 	struct region_node *node = as->regions.head;
 	while (node != NULL) {
-
+		kfree(node->value);
+		node = node->next;
 	}
+
+	pagedirectory_cleanup(node->page)
 	/*
 	 * Clean up as needed.
 	 */

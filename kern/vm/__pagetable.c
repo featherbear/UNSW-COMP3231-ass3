@@ -131,3 +131,9 @@ struct pagedirectory *pagedirectory_init()
     // Success
     return pagedirectory;
 }
+
+void pagedirectory_cleanup(struct pagedirectory *pagedirectory) {
+    // TODO: Release the page directory entries
+    // Also free the frametable pages??? - What about shared frames???
+
+}
