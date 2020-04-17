@@ -108,33 +108,19 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
 
 }
 
-// int pagetable_set(vaddr_t address, paddr_t addr) {
-//     struct pagetable *table = NULL;
-//     paddr_t *frame_reference = pagetable_lookup_tableref(address, &table);
-
-//     PG_LOCK_ACQUIRE();
-//     if (*frame_reference == (paddr_t) NULL) {
-//         table->n_entries++;
-//     }
-//     PG_LOCK_RELEASE();
-
-//     *frame_reference = addr;
-
-//     return 0;
-// }
-
 /* 
  * Creates the first level page table. 
  */
 struct pagedirectory *pagedirectory_init()
 {
+    // Create page directory
     struct pagedirectory *pagedirectory;
-
     if ((pagedirectory = kmalloc(sizeof(struct pagedirectory))) == NULL)
     {
         return NULL;
     }
 
+    // Create level 2 page table pointers
     if ((pagedirectory->entries = kmalloc(PAGE_ENTRY_LIMIT * sizeof(struct pagetable *))) == NULL)
     {
         kfree(pagedirectory);
@@ -148,10 +134,13 @@ struct pagedirectory *pagedirectory_init()
 }
 
 void pagedirectory_cleanup(struct pagedirectory *pagedirectory) {
-    // Also free the frametable pages??? - What about shared frames???
+    // FIXME: Also free the frametable pages??? - What about shared frames???
+    // Not part of the assignment though...
     
+    // Clean up the spin lock
     spinlock_cleanup(&pagedirectory->lock);
     
+    // Remove page table
     if (pagedirectory->entries != NULL) {
         for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
             if (pagedirectory->entries[i]) {
