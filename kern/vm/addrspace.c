@@ -282,10 +282,12 @@ as_prepare_load(struct addrspace *as)
 	struct region_node *node = as->regions.head;
 
 	while (node != NULL) {
-		
-		node->value->writeable++;
+		node->value->writeable = (node->value->writeable << 1) | 1;
 		// 00 -> 01
-		// 01 -> 10
+		// 01 -> 11
+		// |\ 
+		// | Writable
+		// Temp bit
 
 		node = node->next;
 	}
@@ -299,11 +301,19 @@ as_prepare_load(struct addrspace *as)
 int
 as_complete_load(struct addrspace *as)
 {
-	/*
-	 * Write this.
-	 */
+	struct region_node *node = as->regions.head;
 
-	(void)as;
+	while (node != NULL) {
+		node->value->writeable >>= 1;
+		// 01 -> 00
+		// 11 -> 01
+		// |\ 
+		// | Writable
+		// Temp bit
+
+		node = node->next;
+	}
+
 	return 0;
 }
 
@@ -316,11 +326,12 @@ as_complete_load(struct addrspace *as)
 int
 as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 {
-	/*
-	 * Write this.
-	 */
 
-	(void)as;
+																						  // No execute 
+  	int result = as_define_region(as, USERSTACK - USER_STACK_SIZE, USER_STACK_SIZE, 1, 1, 0);
+    if (result) {
+        return result;
+    }
 
 	/* Initial user-level stack pointer */
 	*stackptr = USERSTACK;

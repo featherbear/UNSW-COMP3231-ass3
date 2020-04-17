@@ -84,6 +84,9 @@ struct region {
         unsigned writeable:2; // Temp-bit and writeable bit
         unsigned executable:1;
 }
+
+#define USER_STACK_SIZE (16 * PAGE_SIZE)
+
 /*
  * Functions in addrspace.c:
  *
