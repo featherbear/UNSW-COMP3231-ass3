@@ -23,14 +23,17 @@ void vm_bootstrap(void)
 int
 vm_fault(int faulttype, vaddr_t faultaddress)
 {
-	kprintf("\nFAULT @ 0x%08x : %s\n", faultaddress, faulttype == VM_FAULT_READONLY ? "VM_FAULT_READONLY" : (faulttype ==VM_FAULT_READ ? "VM_FAULT_READ": (faulttype ==VM_FAULT_WRITE?"VM_FAULT_WRITE":"???")));
-    
     switch (faulttype) {
         case VM_FAULT_READONLY:
             return EFAULT;
         case VM_FAULT_READ:
         case VM_FAULT_WRITE:
             {
+
+                if (faultaddress == (vaddr_t) NULL) {
+                    return EFAULT;
+                }
+
                 struct addrspace *as;
                 if ((as = proc_getas()) == NULL) {
                     panic("???");
@@ -48,19 +51,12 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                         continue;
                     }
 
-                    kprintf("Matched region at 0x%08x-0x%08x: %s%s%s\n", region->vaddr, region->vaddr + region->memsize-1,
-                    
-                    region->readable ? "r" : "-",  region->writeable ? "w" : "-",  region->executable ? "x" : "-"
-                    
-                    );
-
                     // Get the addres holding the frame pointer
                     paddr_t *frameRef = pagetable_lookup(faultaddress);
 
                     // If the frame pointer is null, then it does not exist in the page table
                     if (*frameRef == (paddr_t) NULL) {
                         *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));
-                        kprintf("Allocated new page (physical) 0x%08x\n", *frameRef);
                     }
 
                     // EntryHi: 
@@ -72,17 +68,12 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                     //   1 bit - Non-Cacheable (ignore for OS161)  
                     //   1 bit - Dirty -> Check value set from define address space
                     //   1 bit - Valid  
-                    //   1 bit - Global (ignore for OS161 (FIXME: ???))
+                    //   1 bit - Global (ignore for OS161)
                     
                     // RWX -> DV conversion
                     // W -> D
                     // [Any] -> V
-                    kprintf("\nVPN: 0x%08x\nPFN: 0x%08x\nDirty: %c\nValid: %c\n",faultaddress & PAGE_FRAME, *frameRef & PAGE_FRAME, (region->writeable &1) ? 'Y' : 'N', (region->readable || (region->writeable & 1) || region->executable) ? 'Y': 'N');
-                    kprintf("EntryHi: 0x%08x\nEntryLo: 0x%08x\n",faultaddress & PAGE_FRAME, 
-                    (*frameRef & PAGE_FRAME) 
-                    | ((region->writeable & 1) ? TLBLO_DIRTY : 0) 
-                    | ((region->readable || (region->writeable & 1) || region->executable) ? TLBLO_VALID : 0) 
-                    );
+
                     int spl = splhigh();
                     tlb_random(faultaddress & PAGE_FRAME, 
                     (*frameRef & PAGE_FRAME) 

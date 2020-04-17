@@ -74,6 +74,7 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
 
 
     PG_LOCK_ACQUIRE();
+    
     // Create level 2 pagetable if it does not exist
     if (*pagetable_reference == NULL)
     {
