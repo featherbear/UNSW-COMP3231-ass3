@@ -91,6 +91,7 @@ as_create(void)
 int
 as_copy(struct addrspace *old, struct addrspace **ret)
 {
+	kprintf("\nCOPY\n");
 	struct addrspace *new_as;
 	if ((new_as = as_create()) == NULL) {
 		return ENOMEM;
@@ -106,10 +107,10 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
 		if (old_entries[i] != NULL) {
 			struct pagetable *entry = kmalloc(sizeof(struct pagetable));
-			
-			// if (entry == NULL) {
-			// 	as_destroy(new_as);
-			// }
+			if (entry == NULL) {
+				as_destroy(new_as);
+				return ENOMEM;
+			}
 			memcpy(entry, &old_entries[i], sizeof(struct pagetable));
 			new_entries[i] = entry;
 		}
@@ -117,9 +118,11 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 
 	// Replicate region structure
 	struct region_node *region_node = old->regions.head;
-	struct region *region;
+	
 	while (region_node != NULL) {
-		region = region_node->value;
+
+		struct region *region = region_node->value;
+		
 		as_define_region(
 			new_as,
 			region->vaddr, 
@@ -135,6 +138,9 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	// FIXME: Remove
 	// kprintf("Created `as = 0x%08x`\n", (vaddr_t) new_as);
 	// FIXME: Remove
+
+
+	kprintf("\nCOPY FINISH\n");
 
 	*ret = new_as;
 	return 0;
@@ -232,7 +238,7 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 
 	struct region *region;
 	if ((region = kmalloc(sizeof(struct region))) == NULL) {
-		panic("welp.");
+		return ENOMEM;
 	}
 
 	*region = (struct region) {
@@ -246,7 +252,7 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 
 	struct region_node *region_node;
 	if ((region_node = kmalloc(sizeof(struct region_node))) == NULL) {
-		panic("welp.");
+		return ENOMEM;
 	};
 
 	*region_node = (struct region_node) {
