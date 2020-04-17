@@ -66,11 +66,12 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                 // RWX -> DV conversion
                 // W -> D
                 // [Any] -> V
-                
+                int spl = splhigh();
                 tlb_random(faultaddress & PAGE_FRAME, 
                 (*frameRef & PAGE_FRAME) 
                 | (region->writeable ? TLBLO_DIRTY : 0) 
                 | ((region->readable || region->writeable || region->executable) ? TLBLO_VALID : 0) );
+                splx(spl);
 
                 return 0;
             }

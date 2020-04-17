@@ -153,9 +153,7 @@ void
 as_activate(void)
 {
 	struct addrspace *as;
-
-	as = proc_getas();
-	if (as == NULL) {
+	if ((as = proc_getas()) == NULL) {
 		/*
 		 * Kernel thread without an address space; leave the
 		 * prior address space in place.
@@ -163,10 +161,8 @@ as_activate(void)
 		return;
 	}
 
-	/*
-	 * Write this.
-	 */
-	// TODO: Flush the TLB?
+	__clear_tlb();
+
 }
 
 /*
@@ -177,12 +173,23 @@ as_activate(void)
 void
 as_deactivate(void)
 {
+
+	struct addrspace *as;
+	if ((as = proc_getas()) == NULL) {
+		/*
+		 * Kernel thread without an address space; leave the
+		 * prior address space in place.
+		 */
+		return;
+	}
 	/*
 	 * Write this. For many designs it won't need to actually do
 	 * anything. See proc.c for an explanation of why it (might)
 	 * be needed.
 	 */
-	// TODO: Flush the TLB?
+
+	__clear_tlb();
+
 }
 
 

@@ -78,14 +78,6 @@ paddr_t pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) 
     // Return pointer to frame value. May be null (in the event of frame not allocated)    
     return &((*pagetable_reference)->entries[second_index]);
 
-    // // TODO: Assign frame if it does not exist???
-    // if (*frame == NULL) // i.e. pagetable->entries[first_index]->entries[second_index] is null
-    // {
-    //     (*pagetable_reference)->n_entries++;
-    //     // TODO: Assign a frame // *frame
-    // }
-
-    // return ((PAGE_SIZE * *frame) << 20) | offset;
 }
 
 int pagetable_set(vaddr_t address, int frame_no) {
