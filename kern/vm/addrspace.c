@@ -61,25 +61,24 @@ static void __clear_tlb(void);
 struct addrspace *
 as_create(void)
 {
+	// Create address space
 	struct addrspace *as;
-
 	if ((as = kmalloc(sizeof(struct addrspace))) == NULL) {
 		return NULL;
 	}
 
+	// Create page tables
 	if ((as->pagedirectory = pagedirectory_init()) == NULL) {
 		kfree(as);
 		return NULL;
 	};
 
+	// Create regions
 	as->regions = (struct region_container) {
 		.head = NULL,
 		.tail = NULL
 	};
 
-	/*
-	 * Initialize as needed.
-	 */
 	return as;
 }
 
@@ -91,6 +90,7 @@ as_create(void)
 int
 as_copy(struct addrspace *old, struct addrspace **ret)
 {
+	// Create a new region
 	struct addrspace *new_as;
 	if ((new_as = as_create()) == NULL) {
 		return ENOMEM;
@@ -99,29 +99,16 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	struct pagedirectory *old_pagedirectory = old->pagedirectory;
 	struct pagedirectory *new_pagedirectory = new_as->pagedirectory;
 
-	// Replicate page table structure
 	struct pagetable **old_entries = old_pagedirectory->entries;
 	struct pagetable **new_entries = new_pagedirectory->entries;
 
+	// Replicate page table structure
 	for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
 		if (old_entries[i] != NULL) {
-
-			struct pagetable *entry = kmalloc(sizeof(struct pagetable));
-			if (entry == NULL) {
-				as_destroy(new_as);
-				return ENOMEM;
-			}
 			
-			if ((entry->entries = (paddr_t *) kmalloc(PAGE_ENTRY_LIMIT * sizeof(paddr_t))) == NULL) {
-				kfree(entry);
-				as_destroy(new_as);
-				return ENOMEM;
-			}
-
-			memcpy(entry->entries, old_entries[i]->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
-
-			entry->n_entries = old_entries[i]->n_entries;
-			new_entries[i] = entry;
+    	if ((new_entries[i] = clone_pagetable(old_entries[i])) == NULL) {
+			as_destroy(new_as);
+			return ENOMEM;
 		}
 	}
 

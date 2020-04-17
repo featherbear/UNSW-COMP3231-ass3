@@ -15,12 +15,12 @@ struct pagedirectory
 /* Second level page table */
 struct pagetable
 {
-    int n_entries;
+    int n_entries;     // NOT USED
     paddr_t *entries;
 };
 
 paddr_t* pagetable_lookup(vaddr_t);
-// int pagetable_set(vaddr_t, paddr_t);
+paddr
 struct pagedirectory *pagedirectory_init(void);
 void pagedirectory_cleanup(struct pagedirectory *);
 

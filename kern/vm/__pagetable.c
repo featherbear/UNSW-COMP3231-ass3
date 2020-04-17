@@ -8,7 +8,6 @@
 #define PG_LOCK_ACQUIRE() (spinlock_acquire(&(proc_getas()->pagedirectory->lock)))
 #define PG_LOCK_RELEASE() (spinlock_release(&(proc_getas()->pagedirectory->lock)))
 
-
 struct pagetable *create_pagetable(void);
 paddr_t* pagetable_lookup_tableref(vaddr_t, struct pagetable **);
 
@@ -27,18 +26,37 @@ struct pagetable *create_pagetable()
         return NULL;
     }
 
-
     pagetable->n_entries = 0;
 
     // Zero the page entries
     if ((pagetable->entries = kmalloc(PAGE_ENTRY_LIMIT * sizeof(paddr_t))) == NULL) {
         kfree(pagetable);
         return NULL;
-    };
-    
+    };    
     bzero(pagetable->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
 
     return pagetable;
+}
+
+struct pagetable *clone_pagetable(struct pagetable *reference) {
+    if (reference == NULL) {
+        return NULL;
+    }
+
+    // Create new table
+    struct pagetable *entry = kmalloc(sizeof(struct pagetable));
+    if (entry == NULL) {
+        return NULL;
+    }
+
+    if ((entry->entries = (paddr_t *) kmalloc(PAGE_ENTRY_LIMIT * sizeof(paddr_t))) == NULL) {
+        kfree(entry);
+        return NULL;
+    }
+
+    memcpy(entry->entries, reference->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
+
+    entry->n_entries = reference->n_entries;
 }
 
 /* 
@@ -50,8 +68,6 @@ paddr_t* pagetable_lookup(vaddr_t address)
 }
 
 paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) {
-
-    struct pagedirectory *pagedirectory = proc_getas()->pagedirectory;
     /*
      VIRTUAL_MEMORY_ADDRESS
        |       |       \ 
@@ -60,22 +76,15 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
         10 bits - level 1 offset
     */
 
-    // FIXME: Check for Kernel address?
-    
+    struct pagedirectory *pagedirectory = proc_getas()->pagedirectory;
+
+    // Extract indexes; We don't care about the offset as that is managed by the TLB lookup
     int page_number = address >> 12; // (_address & PAGE_FRAME) >> 12;
     int second_index = page_number & 0x3FF;
     int first_index = (page_number >> 10) & 0x3FF;
 
-
-    // int offset = address & ~PAGE_FRAME;
-
-    // int offset = _address & 0xFFF; // Last 12 bits
-    // int index = (_address >>= 12) & 0x3FF; //
-    // int table_index = (_address >>= 10) & 0x3FF;
-
     // Search for level 2 page table
     struct pagetable **pagetable_reference = &pagedirectory->entries[first_index];
-
 
     PG_LOCK_ACQUIRE();
 
@@ -143,6 +152,7 @@ void pagedirectory_cleanup(struct pagedirectory *pagedirectory) {
     
     if (pagedirectory->entries != NULL) {
         for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
+            kfree(pagedirectory->entries[i]->entries);
             kfree(pagedirectory->entries[i]);
         }
     }
