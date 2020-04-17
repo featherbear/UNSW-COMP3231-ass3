@@ -38,25 +38,27 @@ struct pagetable *create_pagetable()
     return pagetable;
 }
 
-struct pagetable *clone_pagetable(struct pagetable *reference) {
+struct pagetable *pagetable_clone(struct pagetable *reference) {
     if (reference == NULL) {
         return NULL;
     }
 
     // Create new table
-    struct pagetable *entry = kmalloc(sizeof(struct pagetable));
-    if (entry == NULL) {
+    struct pagetable *table = kmalloc(sizeof(struct pagetable));
+    if (table == NULL) {
         return NULL;
     }
 
-    if ((entry->entries = (paddr_t *) kmalloc(PAGE_ENTRY_LIMIT * sizeof(paddr_t))) == NULL) {
-        kfree(entry);
+    if ((table->entries = (paddr_t *) kmalloc(PAGE_ENTRY_LIMIT * sizeof(paddr_t))) == NULL) {
+        kfree(table);
         return NULL;
     }
 
-    memcpy(entry->entries, reference->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
+    memcpy(table->entries, reference->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
 
-    entry->n_entries = reference->n_entries;
+    table->n_entries = reference->n_entries;
+
+    return table;
 }
 
 /* 
@@ -152,8 +154,10 @@ void pagedirectory_cleanup(struct pagedirectory *pagedirectory) {
     
     if (pagedirectory->entries != NULL) {
         for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
-            kfree(pagedirectory->entries[i]->entries);
-            kfree(pagedirectory->entries[i]);
+            if (pagedirectory->entries[i]) {
+                kfree(pagedirectory->entries[i]->entries);
+                kfree(pagedirectory->entries[i]);
+            }
         }
     }
 

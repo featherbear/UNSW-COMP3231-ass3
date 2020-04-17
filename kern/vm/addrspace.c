@@ -105,20 +105,17 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	// Replicate page table structure
 	for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
 		if (old_entries[i] != NULL) {
-			
-    	if ((new_entries[i] = clone_pagetable(old_entries[i])) == NULL) {
-			as_destroy(new_as);
-			return ENOMEM;
+			if ((new_entries[i] = pagetable_clone(old_entries[i])) == NULL) {
+				as_destroy(new_as);
+				return ENOMEM;
+			}
 		}
 	}
 
 	// Replicate region structure
 	struct region_node *region_node = old->regions.head;
-	
 	while (region_node != NULL) {
-
 		struct region *region = region_node->value;
-		
 		as_define_region(
 			new_as,
 			region->vaddr, 
@@ -127,7 +124,6 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 			region->writeable,
 		 	region->executable
 		);
-
 		region_node = region_node->next;
 	}
 
@@ -195,7 +191,9 @@ as_destroy(struct addrspace *as)
 	struct region_node *node = as->regions.head;
 	while (node != NULL) {
 		kfree(node->value);
-		node = node->next;
+		struct region_node *next_node = node->next;
+		kfree(node);
+		node = next_node;
 	}
 
 	pagedirectory_cleanup(as->pagedirectory);
