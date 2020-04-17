@@ -26,55 +26,55 @@ vm_fault(int faulttype, vaddr_t faultaddress)
             return EFAULT;
         case VM_FAULT_READ:
         case VM_FAULT_WRITE:
-            
-            struct addrspace *as;
-            if ((as = proc_getas()) == NULL) {
-                panic("???");
-            }
-
-            // Step through the regions until we find the matching region
-            struct region_node *node = as->regions->head;
-
-            while (*node != NULL) {
-                struct region *region = node->value;
-
-                // Check if region contains the fault address
-                if (region->vaddr > faultaddress || faultaddress >= (region->vaddr + region->memsize)) {
-                    node = node->next;
-                    continue;
+            {
+                struct addrspace *as;
+                if ((as = proc_getas()) == NULL) {
+                    panic("???");
                 }
 
-                // Get the addres holding the frame pointer
-                int *frameRef = pagetable_lookup(faultaddress);
+                // Step through the regions until we find the matching region
+                struct region_node *node = as->regions->head;
 
-                // If the frame pointer is null, then it does not exist in the page table
-                if (*frameRef == NULL) {
-                    *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));
+                while (*node != NULL) {
+                    struct region *region = node->value;
+
+                    // Check if region contains the fault address
+                    if (region->vaddr > faultaddress || faultaddress >= (region->vaddr + region->memsize)) {
+                        node = node->next;
+                        continue;
+                    }
+
+                    // Get the addres holding the frame pointer
+                    int *frameRef = pagetable_lookup(faultaddress);
+
+                    // If the frame pointer is null, then it does not exist in the page table
+                    if (*frameRef == NULL) {
+                        *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));
+                    }
+
+                    // EntryHi: 
+                    //   20 bits - VPN
+                    //   6 bits - ASID (ignore for OS161)  
+                    //   6 bits - 000000
+                    // EntryLo: 
+                    //   20 bits - PFN
+                    //   1 bit - Non-Cacheable (ignore for OS161)  
+                    //   1 bit - Dirty -> Check value set from define address space
+                    //   1 bit - Valid  
+                    //   1 bit - Global (ignore for OS161 (FIXME: ???))
+                    
+                    // RWX -> DV conversion
+                    // W -> D
+                    // [Any] -> V
+                    int spl = splhigh();
+                    tlb_random(faultaddress & PAGE_FRAME, 
+                    (*frameRef & PAGE_FRAME) 
+                    | ((region->writeable & 1) ? TLBLO_DIRTY : 0) 
+                    | ((region->readable || region->writeable || region->executable) ? TLBLO_VALID : 0) );
+                    splx(spl);
+
+                    return 0;
                 }
-
-                // EntryHi: 
-                //   20 bits - VPN
-                //   6 bits - ASID (ignore for OS161)  
-                //   6 bits - 000000
-                // EntryLo: 
-                //   20 bits - PFN
-                //   1 bit - Non-Cacheable (ignore for OS161)  
-                //   1 bit - Dirty -> Check value set from define address space
-                //   1 bit - Valid  
-                //   1 bit - Global (ignore for OS161 (FIXME: ???))
-                
-                // RWX -> DV conversion
-                // W -> D
-                // [Any] -> V
-                int spl = splhigh();
-                tlb_random(faultaddress & PAGE_FRAME, 
-                (*frameRef & PAGE_FRAME) 
-                | ((region->writeable & 1) ? TLBLO_DIRTY : 0) 
-                | ((region->readable || region->writeable || region->executable) ? TLBLO_VALID : 0) );
-                splx(spl);
-
-                return 0;
-            }
 
             return EFAULT;
 

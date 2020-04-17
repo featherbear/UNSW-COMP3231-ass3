@@ -2,14 +2,14 @@
 #include <vm.h>
 #include <lib.h>
 #include <addrspace.h>
-#include <current.h>
+#include <proc.h>
 
-#define PG_LOCK_ACQUIRE() (spinlock_acquire(&curproc->p_addrspace->pagedirectory->lock))
-#define PG_LOCK_RELEASE() (spinlock_release(&curproc->p_addrspace->pagedirectory->lock))
+#define PG_LOCK_ACQUIRE() (spinlock_acquire(&proc_getas()->pagedirectory->lock))
+#define PG_LOCK_RELEASE() (spinlock_release(&proc_getas()->pagedirectory->lock))
 
 
 struct pagetable *create_pagetable(void);
-paddr_t pagetable_lookup_tableref(vaddr_t, struct pagetable **);
+paddr_t* pagetable_lookup_tableref(vaddr_t, struct pagetable **);
 
 /*
  * Creates a level 2 page table.
@@ -36,13 +36,13 @@ struct pagetable *create_pagetable()
 /* 
  * Translation from virtual address to physical address 
  */
-paddr_t pagetable_lookup(vaddr_t address)
+paddr_t* pagetable_lookup(vaddr_t address)
 {
    return pagetable_lookup_tableref(address, NULL);
 }
 
-paddr_t pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) {
-    struct pagedirectory *pagedirectory = curproc->p_addrspace->pagedirectory;
+paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) {
+    struct pagedirectory *pagedirectory = proc_getas()->pagedirectory;
     /*
      VIRTUAL_MEMORY_ADDRESS
        |       |       \ 
@@ -57,7 +57,7 @@ paddr_t pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) 
     int second_index = page_number & 0x3FF;
     int first_index = (page_number >> 10) & 0x3FF;
 
-    int offset = address & ~PAGE_FRAME;
+    // int offset = address & ~PAGE_FRAME;
 
     // int offset = _address & 0xFFF; // Last 12 bits
     // int index = (_address >>= 12) & 0x3FF; //
@@ -86,10 +86,10 @@ paddr_t pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) 
 
 int pagetable_set(vaddr_t address, paddr_t addr) {
     struct pagetable *table = NULL;
-    int *frame_reference = pagetable_lookup_tableref(address, &table);
+    paddr_t *frame_reference = pagetable_lookup_tableref(address, &table);
 
     PG_LOCK_ACQUIRE();
-    if (*frame_reference == NULL) {
+    if (*frame_reference == (paddr_t) NULL) {
         table->n_entries++;
     }
     PG_LOCK_RELEASE();

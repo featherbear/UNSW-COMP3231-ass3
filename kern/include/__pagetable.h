@@ -9,7 +9,7 @@
 struct pagedirectory
 {
     struct spinlock lock;        // Global spinlock for ALL page table and level 2 page table operations
-    struct pagetable *entries[]; // Array of page tables
+    struct pagetable **entries;  // Array of page tables
 };
 
 /* Second level page table */
@@ -19,7 +19,7 @@ struct pagetable
     paddr_t entries[];
 };
 
-paddr_t pagetable_lookup(vaddr_t);
+paddr_t* pagetable_lookup(vaddr_t);
 int pagetable_set(vaddr_t, paddr_t);
 struct pagedirectory *pagedirectory_init(void);
 void pagedirectory_cleanup(struct pagedirectory *);
