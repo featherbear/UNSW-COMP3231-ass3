@@ -132,7 +132,14 @@ struct pagedirectory *pagedirectory_init()
 }
 
 void pagedirectory_cleanup(struct pagedirectory *pagedirectory) {
-    // TODO: Release the page directory entries
     // Also free the frametable pages??? - What about shared frames???
+    
+    if (pagedirectory->entries != NULL) {
+        for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
+            kfree(pagedirectory->entries[i]);
+        }
+    }
+    kfree(pagedirectory->entries);
 
+    spinlock_cleanup(&pagedirectory->lock);
 }

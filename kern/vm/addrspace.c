@@ -115,6 +115,9 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
 		if (old_entries[i] != NULL) {
 			struct pagetable *entry = kmalloc(sizeof(struct pagetable));
+			// if (entry == NULL) {
+			// 	as_destroy(new_as);
+			// }
 			memcpy(entry, &old_entries[i], sizeof(struct pagetable));
 			new_entries[i] = entry;
 		}
@@ -125,18 +128,17 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	struct region *region;
 	while (region_node != NULL) {
 		region = region_node->value;
-		as_define_region(new_as,
-		 region->vaddr, 
-		region->memsize, 
-		region->readable, 
-		region->writeable,
-		 region->executable)
+		as_define_region(
+			new_as,
+			region->vaddr, 
+			region->memsize, 
+			region->readable, 
+			region->writeable,
+		 	region->executable
+		);
+
+		region_node = region_node->next;
 	}
-
-
-	
-
-	(void)old;
 
 	*ret = new_as;
 	return 0;
