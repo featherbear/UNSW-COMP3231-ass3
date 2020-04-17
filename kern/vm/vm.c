@@ -23,7 +23,7 @@ void vm_bootstrap(void)
 int
 vm_fault(int faulttype, vaddr_t faultaddress)
 {
-	kprintf("\nFAULT @ 0x%08x %s\n", faultaddress, faulttype == VM_FAULT_READONLY ? "VM_FAULT_READONLY" : (faulttype ==VM_FAULT_READ ? "VM_FAULT_READ": (faulttype ==VM_FAULT_WRITE?"VM_FAULT_WRITE":"???")));
+	kprintf("\nFAULT @ 0x%08x : %s\n", faultaddress, faulttype == VM_FAULT_READONLY ? "VM_FAULT_READONLY" : (faulttype ==VM_FAULT_READ ? "VM_FAULT_READ": (faulttype ==VM_FAULT_WRITE?"VM_FAULT_WRITE":"???")));
 
     switch (faulttype) {
         case VM_FAULT_READONLY:
@@ -44,16 +44,22 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
                     // Check if region contains the fault address
                     if (region->vaddr > faultaddress || faultaddress >= (region->vaddr + region->memsize)) {
-                        kprintf("Not the region at 0x%08x\n", region->vaddr);
                         node = node->next;
                         continue;
                     }
-                    kprintf("The region at 0x%08x\n", region->vaddr);
+
+                    kprintf("Matched region at 0x%08x-0x%08x\n", region->vaddr, region->vaddr + region->memsize-1);
+
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("Region assigned from 0x%08x to 0x%08x as %s%s%s", 
+	vaddr, vaddr+memsize-1, readable ? "r" : "-",  writeable ? "w" : "-",  executable ? "x" : "-"
+	);
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+
 
                     // Get the addres holding the frame pointer
                     paddr_t *frameRef = pagetable_lookup(faultaddress);
 
-                    kprintf("frameRef at 0x%08x points to 0x%08x\n", (vaddr_t) frameRef,*frameRef);
                     // If the frame pointer is null, then it does not exist in the page table
                     if (*frameRef == (paddr_t) NULL) {
                         *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));

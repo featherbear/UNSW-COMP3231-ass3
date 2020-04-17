@@ -77,10 +77,6 @@ as_create(void)
 	/*
 	 * Initialize as needed.
 	 */
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("Address Space: %p", as);
-	kprintf("\nPage Directory set to 0x%08x\n", (int) as->pagedirectory);
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	return as;
 }
 
@@ -92,10 +88,6 @@ as_create(void)
 int
 as_copy(struct addrspace *old, struct addrspace **ret)
 {
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("BEGIN AS_COPY");
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-
 	struct addrspace *new_as;
 
 	new_as = as_create();
@@ -228,15 +220,6 @@ int
 as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 		 int readable, int writeable, int executable)
 {
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("BEGIN AS_DEFINE");
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-
-
-	// FIXME: :::
-	writeable = 1;
-	// FIXME: :::
-
 	// TODO: Check if as is null!?
 
 	// TODO: Lock???
@@ -296,8 +279,7 @@ as_prepare_load(struct addrspace *as)
 	struct region_node *node = as->regions.head;
 
 	while (node != NULL) {
-		node->value->writeable = 1;
-		// FIXME: node->value->writeable = (node->value->writeable << 1) | 1;
+		node->value->writeable = (node->value->writeable << 1) | 1;
 		/*
 		 00 -> 01
 		 01 -> 11
@@ -308,9 +290,6 @@ as_prepare_load(struct addrspace *as)
 
 		node = node->next;
 	}
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("PREPARE LOAD");
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	return 0;
 }
 
@@ -320,14 +299,10 @@ as_prepare_load(struct addrspace *as)
 int
 as_complete_load(struct addrspace *as)
 {
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("AS_COMPLETE_LOAD");
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	struct region_node *node = as->regions.head;
 
 	while (node != NULL) {
-		node->value->writeable = 1;
-		// FIXME:  node->value->writeable >>= 1;
+		node->value->writeable >>= 1;
 		/*
 		 01 -> 00
 		 11 -> 01
@@ -363,9 +338,6 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 	/* Initial user-level stack pointer */
 	*stackptr = USERSTACK;
 
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("STACK DEFINED");
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	return 0;
 }
 

@@ -16,7 +16,7 @@ struct pagedirectory
 struct pagetable
 {
     int n_entries;
-    paddr_t entries[];
+    paddr_t *entries;
 };
 
 paddr_t* pagetable_lookup(vaddr_t);

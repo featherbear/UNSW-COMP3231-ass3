@@ -473,7 +473,6 @@ proc_getas(void)
 struct addrspace *
 proc_setas(struct addrspace *newas)
 {	
-	kprintf("\n CHANGING ADDRESS SPACE to 0x%08x || 0x%08x \n", (int) newas, (int) newas->pagedirectory);
 	struct addrspace *oldas;
 	struct proc *proc = curproc;
 
@@ -482,9 +481,7 @@ proc_setas(struct addrspace *newas)
 	spinlock_acquire(&proc->p_lock);
 	oldas = proc->p_addrspace;
 	proc->p_addrspace = newas;
-	
-	kprintf("\n 0x%08x \n", (int) proc->p_addrspace->pagedirectory);
-
 	spinlock_release(&proc->p_lock);
+	
 	return oldas;
 }
