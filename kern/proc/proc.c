@@ -303,8 +303,6 @@ proc_fork(struct proc **ret)
 		}
 	}
 
-	kprintf("AS COPY FIN\n");
-
 	/* VFS fields */
 	tbl = curproc->p_filetable;
 	if (tbl != NULL) {
@@ -319,9 +317,6 @@ proc_fork(struct proc **ret)
 		}
 	}
 
-		kprintf("FILE TABLE FIN\n");
-
-
 	/*
 	 * Lock the current process to copy its current directory.
 	 * (We don't need to lock the new process, though, as we have
@@ -335,6 +330,7 @@ proc_fork(struct proc **ret)
 	spinlock_release(&curproc->p_lock);
 
 	*ret = newproc;
+
 	return 0;
 }
 

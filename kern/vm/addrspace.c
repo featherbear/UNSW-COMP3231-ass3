@@ -106,12 +106,34 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 
 	for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
 		if (old_entries[i] != NULL) {
+			for (int j = 0; j < PAGE_ENTRY_LIMIT; j++) {
+				if (old_entries[i]->entries[j] != (paddr_t) NULL) {
+					kprintf("Frame found at [%d][%d] -> 0x%08x\n", i, j, old_entries[i]->entries[j]);
+				}
+			}
+
 			struct pagetable *entry = kmalloc(sizeof(struct pagetable));
 			if (entry == NULL) {
 				as_destroy(new_as);
 				return ENOMEM;
 			}
-			memcpy(entry, &old_entries[i], sizeof(struct pagetable));
+			
+			if ((entry->entries = (paddr_t *) kmalloc(PAGE_ENTRY_LIMIT * sizeof(paddr_t)) == NULL)) {
+				kfree(entry);
+				as_destroy(new_as);
+				return ENOMEM;
+			}
+			memcpy(entry->entries, &old_entries[i]->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
+
+			entry->n_entries = old_entries[i]->n_entries;
+
+			for (int j = 0; j < PAGE_ENTRY_LIMIT; j++) {
+				if (entry->entries[j] != (paddr_t) NULL) {
+					kprintf("CHECK: Frame found at [%d][%d] -> 0x%08x\n", i, j, entry->entries[j]);
+				}
+			}
+
+
 			new_entries[i] = entry;
 		}
 	}
