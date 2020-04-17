@@ -116,9 +116,9 @@ struct pagedirectory *pagedirectory_init()
 
 
     // FIXME: Don't need this - it's already implemented in unsw.c
-    // paddr_t highest_physical_addr = ram_getsize();
-    // paddr_t lowest_physical_addr = ram_getfirstfree();
-    // unsigned int n_entries = (highest_physical_addr - lowest_physical_addr) / PAGE_SIZE;
+    // FIXME: paddr_t highest_physical_addr = ram_getsize();
+    // FIXME: paddr_t lowest_physical_addr = ram_getfirstfree();
+    // FIXME: unsigned int n_entries = (highest_physical_addr - lowest_physical_addr) / PAGE_SIZE;
 
     if ((pagedirectory->entries = kmalloc(1024 * sizeof(struct pagetable *))) == NULL)
     {

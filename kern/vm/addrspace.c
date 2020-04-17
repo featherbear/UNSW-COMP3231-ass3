@@ -98,20 +98,19 @@ as_create(void)
 int
 as_copy(struct addrspace *old, struct addrspace **ret)
 {
-	struct addrspace *newas;
+	struct addrspace *new_as;
 
-	newas = as_create();
-	if (newas==NULL) {
+	new_as = as_create();
+	if (new_as==NULL) {
 		return ENOMEM;
 	}
 
-	/*
-	 * Write this.
-	 */
+	
+	 memcpy
 
 	(void)old;
 
-	*ret = newas;
+	*ret = new_as;
 	return 0;
 }
 
@@ -137,6 +136,7 @@ as_activate(void)
 	/*
 	 * Write this.
 	 */
+	// TODO: Flush the TLB?
 }
 
 /*
@@ -152,6 +152,7 @@ as_deactivate(void)
 	 * anything. See proc.c for an explanation of why it (might)
 	 * be needed.
 	 */
+	// TODO: Flush the TLB?
 }
 
 
@@ -169,10 +170,7 @@ as_destroy(struct addrspace *as)
 		node = node->next;
 	}
 
-	pagedirectory_cleanup(node->page)
-	/*
-	 * Clean up as needed.
-	 */
+	pagedirectory_cleanup(as->pagedirectory);
 
 	kfree(as);
 }
