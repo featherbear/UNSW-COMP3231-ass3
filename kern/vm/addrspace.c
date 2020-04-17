@@ -108,16 +108,21 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	struct pagedirectory *old_pagedirectory = old->pagedirectory;
 	struct pagedirectory *new_pagedirectory = new_as->pagedirectory;
 
+	// Replicate page table structure
 	struct pagetable *old_entries[] = old_pagedirectory->entries;
-	struct pagetable *new_entries[] = new_as->pagedirectory->entries;
+	struct pagetable *new_entries[] = new_pagedirectory->entries;
 
-	for (int i = 0; i < 1024; i++) {
-		if (entries[i] != NULL) {
+	for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
+		if (old_entries[i] != NULL) {
 			struct pagetable *entry = kmalloc(sizeof(struct pagetable));
-			memcpy(entry, &entries[i], sizeof(struct pagetable));
-			
+			memcpy(entry, &old_entries[i], sizeof(struct pagetable));
+			new_entries[i] = entry;
 		}
 	}
+
+	// Replicate region structure
+	old_as->regions.head
+	as_define_region
 
 	(void)old;
 
@@ -205,6 +210,8 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 		 int readable, int writeable, int executable)
 {
 	// TODO: Check if as is null!?
+
+	// TODO: Lock???
 
 	struct region *region;
 	if ((region = kmalloc(sizeof(struct region))) == NULL) {

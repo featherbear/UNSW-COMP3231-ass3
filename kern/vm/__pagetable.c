@@ -24,9 +24,9 @@ struct pagetable *create_pagetable()
     pagetable->n_entries = 0;
 
     // Assign page table references
-    pagetable->entries = kmalloc(sizeof(/* 2^10 entries */ 1024 * sizeof(paddr_t)));
+    pagetable->entries = kmalloc(sizeof(PAGE_ENTRY_LIMIT * sizeof(paddr_t)));
     kassert(pagetable->entries != NULL);
-    bzero(pagetable->entries, 1024 * sizeof(int));
+    bzero(pagetable->entries, PAGE_ENTRY_LIMIT * sizeof(int));
 
     return pagetable;
 }
@@ -119,13 +119,13 @@ struct pagedirectory *pagedirectory_init()
     // FIXME: paddr_t lowest_physical_addr = ram_getfirstfree();
     // FIXME: unsigned int n_entries = (highest_physical_addr - lowest_physical_addr) / PAGE_SIZE;
 
-    if ((pagedirectory->entries = kmalloc(1024 * sizeof(struct pagetable *))) == NULL)
+    if ((pagedirectory->entries = kmalloc(PAGE_ENTRY_LIMIT * sizeof(struct pagetable *))) == NULL)
     {
         spinlock_cleanup(&pagedirectory->lock);
         return NULL;
     }
 
-    bzero(pagedirectory->entries, 1024 * sizeof(struct pagetable *));
+    bzero(pagedirectory->entries, PAGE_ENTRY_LIMIT * sizeof(struct pagetable *));
 
     // Success
     return pagedirectory;

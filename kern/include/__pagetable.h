@@ -24,4 +24,6 @@ int pagetable_set(vaddr_t address, int frame_no);
 struct pagedirectory *pagedirectory_init();
 void pagedirectory_cleanup(struct pagedirectory *pagedirectory);
 
+#define PAGE_ENTRY_LIMIT 1024 /* 2^10 == 1024 */
+
 #endif /* ___PAGETABLE_H_ */
