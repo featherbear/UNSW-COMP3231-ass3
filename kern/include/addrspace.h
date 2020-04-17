@@ -45,32 +45,7 @@ struct vnode;
 /*
  * Address space - data structure associated with the virtual memory
  * space of a process.
- *
- * You write this.
  */
-
-struct addrspace {
-// #if OPT_DUMBVM
-//         vaddr_t as_vbase1;
-//         paddr_t as_pbase1;
-//         size_t as_npages1;
-//         vaddr_t as_vbase2;
-//         paddr_t as_pbase2;
-//         size_t as_npages2;
-//         paddr_t as_stackpbase;
-// #else
-        /* Put stuff here for your VM system */
-        struct pagedirectory *pagedirectory;
-        struct region_container regions; // Linked list
-// #endif
-};
-
-
-struct region_container {
-        // Linked list
-        struct region_node *head;
-        struct region_node *tail;
-};
 
 struct region_node {
         struct region *value;
@@ -83,7 +58,31 @@ struct region {
         unsigned readable:1;
         unsigned writeable:2; // Temp-bit and writeable bit
         unsigned executable:1;
-}
+};
+
+struct region_container {
+        // Linked list
+        struct region_node *head;
+        struct region_node *tail;
+};
+
+
+struct addrspace {
+#if OPT_DUMBVM
+        vaddr_t as_vbase1;
+        paddr_t as_pbase1;
+        size_t as_npages1;
+        vaddr_t as_vbase2;
+        paddr_t as_pbase2;
+        size_t as_npages2;
+        paddr_t as_stackpbase;
+#else
+        struct pagedirectory *pagedirectory;
+        struct region_container regions; // Linked list
+#endif
+};
+
+
 
 #define USER_STACK_SIZE (16 * PAGE_SIZE)
 
