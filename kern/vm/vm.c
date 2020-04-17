@@ -24,7 +24,7 @@ int
 vm_fault(int faulttype, vaddr_t faultaddress)
 {
 	kprintf("\nFAULT @ 0x%08x : %s\n", faultaddress, faulttype == VM_FAULT_READONLY ? "VM_FAULT_READONLY" : (faulttype ==VM_FAULT_READ ? "VM_FAULT_READ": (faulttype ==VM_FAULT_WRITE?"VM_FAULT_WRITE":"???")));
-
+    
     switch (faulttype) {
         case VM_FAULT_READONLY:
             return EFAULT;
@@ -60,7 +60,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                     // If the frame pointer is null, then it does not exist in the page table
                     if (*frameRef == (paddr_t) NULL) {
                         *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));
-                        kprintf("Allocated new page 0x%08x\n", *frameRef);
+                        kprintf("Allocated new page (physical) 0x%08x\n", *frameRef);
                     }
 
                     // EntryHi: 

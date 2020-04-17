@@ -57,7 +57,7 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
     */
 
     // FIXME: Check for Kernel address?
-
+    
     int page_number = address >> 12; // (_address & PAGE_FRAME) >> 12;
     int second_index = page_number & 0x3FF;
     int first_index = (page_number >> 10) & 0x3FF;
