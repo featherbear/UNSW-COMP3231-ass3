@@ -163,6 +163,10 @@ as_deactivate(void)
 void
 as_destroy(struct addrspace *as)
 {
+	struct region_node *node = as->regions.head;
+	while (node != NULL) {
+
+	}
 	/*
 	 * Clean up as needed.
 	 */
@@ -214,13 +218,11 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 		.next = NULL
 	};
 
-	if (as->regions->head) {
-		if (as->regions->tail) {
-			as->regions->tail->next = region_node;
-			as->regions->tail = region_node;
-		}
+	if (as->regions.tail != NULL) {
+		as->regions.tail->next = region_node;
+		as->regions.tail = region_node;
 	} else {
-		as->regions->head = as->regions->tail = region_node;
+		as->regions.head = as->regions.tail = region_node;
 	}
 	
 	// FIXME: Return code
