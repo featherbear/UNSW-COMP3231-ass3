@@ -121,8 +121,20 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	}
 
 	// Replicate region structure
-	old_as->regions.head
-	as_define_region
+	struct region_node *region_node = old_as->regions.head;
+	struct region *region;
+	while (region_node != NULL) {
+		region = region_node->value;
+		as_define_region(new_as,
+		 region->vaddr, 
+		region->memsize, 
+		region->readable, 
+		region->writeable,
+		 region->executable)
+	}
+
+
+	
 
 	(void)old;
 
