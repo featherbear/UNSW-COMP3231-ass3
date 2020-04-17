@@ -262,16 +262,17 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 	if (as->regions.tail != NULL) {
 		as->regions.tail->next = region_node;
 		as->regions.tail = region_node;
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("ASSIGN REGION");
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	} else {
 		as->regions.head = as->regions.tail = region_node;
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("ASSIGN HEAD OF REGIONS");
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	}
 	
+
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("Region assigned from 0x%08x to 0x%08x as %s%s%s", 
+	vaddr, vaddr+memsize-1, readable ? "r" : "-",  writeable ? "w" : "-",  executable ? "x" : "-"
+	);
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+
 	// FIXME: Return code
 	return 0;
 }
