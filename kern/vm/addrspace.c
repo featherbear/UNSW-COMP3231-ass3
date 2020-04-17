@@ -279,7 +279,17 @@ as_prepare_load(struct addrspace *as)
 	// But we first need to write the program instructions into that space.
 	// Mark read only regions as writeable
 
-	(void)as;
+	struct region_node *node = as->regions.head;
+
+	while (node != NULL) {
+		
+		node->value->writeable++;
+		// 00 -> 01
+		// 01 -> 10
+
+		node = node->next;
+	}
+
 	return 0;
 }
 

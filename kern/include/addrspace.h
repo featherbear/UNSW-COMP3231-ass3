@@ -81,11 +81,7 @@ struct region {
         vaddr_t vaddr;
         size_t memsize;
         unsigned readable:1;
-        
-        union s {
-        unsigned writeable:1;
-        };
-        
+        unsigned writeable:2; // Temp-bit and writeable bit
         unsigned executable:1;
 }
 /*
