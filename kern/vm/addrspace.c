@@ -275,9 +275,9 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 int
 as_prepare_load(struct addrspace *as)
 {
-	/*
-	 * Write this.
-	 */
+	// Code regions inside of the address are non-writable to the program
+	// But we first need to write the program instructions into that space.
+	// Mark read only regions as writeable
 
 	(void)as;
 	return 0;
