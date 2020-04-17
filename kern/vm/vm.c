@@ -5,6 +5,8 @@
 #include <addrspace.h>
 #include <vm.h>
 #include <machine/tlb.h>
+#include <proc.h>
+#include <spl.h>
 
 /* Place your page table functions here */
 
@@ -33,9 +35,9 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                 }
 
                 // Step through the regions until we find the matching region
-                struct region_node *node = as->regions->head;
+                struct region_node *node = as->regions.head;
 
-                while (*node != NULL) {
+                while (node != NULL) {
                     struct region *region = node->value;
 
                     // Check if region contains the fault address
@@ -45,10 +47,10 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                     }
 
                     // Get the addres holding the frame pointer
-                    int *frameRef = pagetable_lookup(faultaddress);
+                    paddr_t *frameRef = pagetable_lookup(faultaddress);
 
                     // If the frame pointer is null, then it does not exist in the page table
-                    if (*frameRef == NULL) {
+                    if (*frameRef == (paddr_t) NULL) {
                         *frameRef = KVADDR_TO_PADDR(alloc_kpages(1));
                     }
 
@@ -75,6 +77,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
                     return 0;
                 }
+            }
 
             return EFAULT;
 
