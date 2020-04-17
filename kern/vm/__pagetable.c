@@ -24,7 +24,7 @@ struct pagetable *create_pagetable()
     pagetable->n_entries = 0;
 
     // Assign page table references
-    pagetable->entries = kmalloc(sizeof(/* 2^10 entries */ 1024 * sizeof(int)));
+    pagetable->entries = kmalloc(sizeof(/* 2^10 entries */ 1024 * sizeof(paddr_t)));
     kassert(pagetable->entries != NULL);
     bzero(pagetable->entries, 1024 * sizeof(int));
 
@@ -34,13 +34,12 @@ struct pagetable *create_pagetable()
 /* 
  * Translation from virtual address to physical address 
  */
-paddr_t *pagetable_lookup(vaddr_t *address)
+paddr_t pagetable_lookup(vaddr_t address)
 {
    return pagetable_lookup_tableref(address, NULL);
 }
 
-paddr_t *pagetable_lookup_tableref(vaddr_t *address, struct pagetable** tableref) {
-    vaddr_t _address = (vaddr_t)address;
+paddr_t pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) {
 
     // VIRTUAL_MEMORY_ADDRESS
     //   |       |       \ 
@@ -50,11 +49,11 @@ paddr_t *pagetable_lookup_tableref(vaddr_t *address, struct pagetable** tableref
 
     // FIXME: Check for Kernel address?
 
-    int page_number = _address >> 12; // (_address & PAGE_FRAME) >> 12;
+    int page_number = address >> 12; // (_address & PAGE_FRAME) >> 12;
     int second_index = page_number & 0x3FF;
     int first_index = (page_number >> 10) & 0x3FF;
 
-    int offset = _address & ~PAGE_FRAME;
+    int offset = address & ~PAGE_FRAME;
 
     // int offset = _address & 0xFFF; // Last 12 bits
     // int index = (_address >>= 12) & 0x3FF; //
@@ -89,7 +88,7 @@ paddr_t *pagetable_lookup_tableref(vaddr_t *address, struct pagetable** tableref
     // return ((PAGE_SIZE * *frame) << 20) | offset;
 }
 
-int pagetable_set(vaddr_t *address, int frame_no) {
+int pagetable_set(vaddr_t address, int frame_no) {
     struct pagetable *table = NULL;
     int *frame_reference = pagetable_lookup_tableref(address, &table);
     PG_LOCK_ACQUIRE();

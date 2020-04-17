@@ -105,8 +105,19 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 		return ENOMEM;
 	}
 
-	
-	 memcpy
+	struct pagedirectory *old_pagedirectory = old->pagedirectory;
+	struct pagedirectory *new_pagedirectory = new_as->pagedirectory;
+
+	struct pagetable *old_entries[] = old_pagedirectory->entries;
+	struct pagetable *new_entries[] = new_as->pagedirectory->entries;
+
+	for (int i = 0; i < 1024; i++) {
+		if (entries[i] != NULL) {
+			struct pagetable *entry = kmalloc(sizeof(struct pagetable));
+			memcpy(entry, &entries[i], sizeof(struct pagetable));
+			
+		}
+	}
 
 	(void)old;
 
