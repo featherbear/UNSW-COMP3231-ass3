@@ -48,14 +48,11 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                         continue;
                     }
 
-                    kprintf("Matched region at 0x%08x-0x%08x\n", region->vaddr, region->vaddr + region->memsize-1);
-
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("Region assigned from 0x%08x to 0x%08x as %s%s%s", 
-	vaddr, vaddr+memsize-1, readable ? "r" : "-",  writeable ? "w" : "-",  executable ? "x" : "-"
-	);
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-
+                    kprintf("Matched region at 0x%08x-0x%08x: %s%s%s\n", region->vaddr, region->vaddr + region->memsize-1,
+                    
+                    region->readable ? "r" : "-",  region->writeable ? "w" : "-",  region->executable ? "x" : "-"
+                    
+                    );
 
                     // Get the addres holding the frame pointer
                     paddr_t *frameRef = pagetable_lookup(faultaddress);
