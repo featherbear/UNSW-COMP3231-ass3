@@ -23,6 +23,8 @@ void vm_bootstrap(void)
 int
 vm_fault(int faulttype, vaddr_t faultaddress)
 {
+	kprintf("\n\nFAULT @ %p %s\n\n", faulttype == VM_FAULT_READONLY ? "VM_FAULT_READONLY" : (faulttype ==VM_FAULT_READ ? "VM_FAULT_READ": (faulttype ==VM_FAULT_WRITE?"VM_FAULT_WRITE":"???")));
+
     switch (faulttype) {
         case VM_FAULT_READONLY:
             return EFAULT;

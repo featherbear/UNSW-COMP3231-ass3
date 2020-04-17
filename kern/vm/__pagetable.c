@@ -127,6 +127,10 @@ struct pagedirectory *pagedirectory_init()
     bzero(pagedirectory->entries, PAGE_ENTRY_LIMIT * sizeof(struct pagetable *));
 
     // Success
+    kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("Page Directory: %p", pagedirectory);
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+
     return pagedirectory;
 }
 

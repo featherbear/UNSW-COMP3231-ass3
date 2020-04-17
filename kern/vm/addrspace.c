@@ -68,8 +68,6 @@ as_create(void)
 		return NULL;
 	}
 
-	// TODO: Initialise our addrspace struct
-	
 	as->pagedirectory = pagedirectory_init();
 	as->regions = (struct region_container) {
 		.head = NULL,
@@ -80,7 +78,8 @@ as_create(void)
 	 * Initialize as needed.
 	 */
 	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("%p", as)
+	kprintf("Address Space: %p", as);
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	return as;
 }
 
@@ -92,6 +91,10 @@ as_create(void)
 int
 as_copy(struct addrspace *old, struct addrspace **ret)
 {
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("BEGIN AS_COPY");
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+
 	struct addrspace *new_as;
 
 	new_as = as_create();
@@ -224,6 +227,10 @@ int
 as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 		 int readable, int writeable, int executable)
 {
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("BEGIN AS_DEFINE");
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+
 	// TODO: Check if as is null!?
 
 	// TODO: Lock???
@@ -255,8 +262,14 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 	if (as->regions.tail != NULL) {
 		as->regions.tail->next = region_node;
 		as->regions.tail = region_node;
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("ASSIGN REGION");
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	} else {
 		as->regions.head = as->regions.tail = region_node;
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("ASSIGN HEAD OF REGIONS");
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	}
 	
 	// FIXME: Return code
@@ -287,7 +300,9 @@ as_prepare_load(struct addrspace *as)
 
 		node = node->next;
 	}
-
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("PREPARE LOAD");
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	return 0;
 }
 
@@ -297,6 +312,9 @@ as_prepare_load(struct addrspace *as)
 int
 as_complete_load(struct addrspace *as)
 {
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("AS_COMPLETE_LOAD");
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	struct region_node *node = as->regions.head;
 
 	while (node != NULL) {
@@ -336,6 +354,9 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 	/* Initial user-level stack pointer */
 	*stackptr = USERSTACK;
 
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("STACK DEFINED");
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 	return 0;
 }
 
