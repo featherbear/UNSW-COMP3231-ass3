@@ -359,6 +359,7 @@ loadexec(char *path, vaddr_t *entrypoint, vaddr_t *stackptr)
 	oldvm = proc_setas(newvm);
 	as_activate();
 
+kprintf("\nLOADING ELF\n");
  	/*
 	 * Load the executable. If it fails, restore the old address
 	 * space and (re-)activate it.
@@ -375,6 +376,7 @@ loadexec(char *path, vaddr_t *entrypoint, vaddr_t *stackptr)
 
 	vfs_close(v);
 
+kprintf("\nDEFINE STACK\n");
 	/* Define the user stack in the address space */
 	result = as_define_stack(newvm, stackptr);
 	if (result) {

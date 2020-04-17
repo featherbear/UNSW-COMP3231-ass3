@@ -232,6 +232,11 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 	kprintf("BEGIN AS_DEFINE");
 	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 
+
+	// FIXME: :::
+	writeable = 1;
+	// FIXME: :::
+
 	// TODO: Check if as is null!?
 
 	// TODO: Lock???
@@ -291,7 +296,8 @@ as_prepare_load(struct addrspace *as)
 	struct region_node *node = as->regions.head;
 
 	while (node != NULL) {
-		node->value->writeable = (node->value->writeable << 1) | 1;
+		node->value->writeable = 1;
+		// FIXME: node->value->writeable = (node->value->writeable << 1) | 1;
 		/*
 		 00 -> 01
 		 01 -> 11
@@ -320,7 +326,8 @@ as_complete_load(struct addrspace *as)
 	struct region_node *node = as->regions.head;
 
 	while (node != NULL) {
-		node->value->writeable >>= 1;
+		node->value->writeable = 1;
+		// FIXME:  node->value->writeable >>= 1;
 		/*
 		 01 -> 00
 		 11 -> 01
