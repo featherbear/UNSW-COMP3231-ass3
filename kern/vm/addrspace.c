@@ -327,10 +327,12 @@ int
 as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 {
 
-																						  // No execute 
-  	int result = as_define_region(as, USERSTACK - USER_STACK_SIZE, USER_STACK_SIZE, 1, 1, 0);
-    if (result) {
-        return result;
+	// Define the stack as the last `USER_STACK_SIZE` bytes from USERSTACK
+	// Allow Read and Write, but not Execute
+  	int error = as_define_region(as, USERSTACK - USER_STACK_SIZE, USER_STACK_SIZE, 1, 1, 0);
+    
+	if (error) {
+        return error;
     }
 
 	/* Initial user-level stack pointer */

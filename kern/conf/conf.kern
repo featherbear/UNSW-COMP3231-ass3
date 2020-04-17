@@ -343,8 +343,10 @@ file      proc/pid.c
 
 file      vm/kmalloc.c
 
+
 optofffile dumbvm   vm/addrspace.c
 optofffile dumbvm   vm/vm.c
+optofffile dumbvm   vm/__pagetable.c
 
 #
 # Network
