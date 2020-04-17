@@ -79,7 +79,8 @@ as_create(void)
 	/*
 	 * Initialize as needed.
 	 */
-
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("%p", as)
 	return as;
 }
 
