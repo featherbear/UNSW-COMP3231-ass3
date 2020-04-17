@@ -77,11 +77,17 @@ vm_fault(int faulttype, vaddr_t faultaddress)
                     // RWX -> DV conversion
                     // W -> D
                     // [Any] -> V
+                    kprintf("\nVPN: 0x%08x\nPFN: 0x%08x\nDirty: %c\nValid: %c\n",faultaddress & PAGE_FRAME, *frameRef & PAGE_FRAME, (region->writeable &1) ? 'Y' : 'N', (region->readable || (region->writeable & 1) || region->executable) ? 'Y': 'N');
+                    kprintf("EntryHi: 0x%08x\nEntryLo: 0x%08x\n",faultaddress & PAGE_FRAME, 
+                    (*frameRef & PAGE_FRAME) 
+                    | ((region->writeable & 1) ? TLBLO_DIRTY : 0) 
+                    | ((region->readable || (region->writeable & 1) || region->executable) ? TLBLO_VALID : 0) 
+                    );
                     int spl = splhigh();
                     tlb_random(faultaddress & PAGE_FRAME, 
                     (*frameRef & PAGE_FRAME) 
                     | ((region->writeable & 1) ? TLBLO_DIRTY : 0) 
-                    | ((region->readable || region->writeable || region->executable) ? TLBLO_VALID : 0) );
+                    | ((region->readable || (region->writeable & 1) || region->executable) ? TLBLO_VALID : 0) );
                     splx(spl);
 
                     return 0;
