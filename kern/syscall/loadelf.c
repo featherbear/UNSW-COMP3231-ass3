@@ -258,6 +258,7 @@ load_elf(struct vnode *v, vaddr_t *entrypoint)
 		return result;
 	}
 
+kprintf("\nLoad fin\n");
 	/*
 	 * Now actually load each segment.
 	 */
@@ -295,12 +296,12 @@ load_elf(struct vnode *v, vaddr_t *entrypoint)
 			return result;
 		}
 	}
-
+kprintf("\nStart complete load\n");
 	result = as_complete_load(as);
 	if (result) {
 		return result;
 	}
-
+kprintf("\nComplete load finish\n");
 	*entrypoint = eh.e_entry;
 
 	return 0;

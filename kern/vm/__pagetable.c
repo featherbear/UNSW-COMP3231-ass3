@@ -5,8 +5,8 @@
 #include <proc.h>
 #include <current.h>
 
-#define PG_LOCK_ACQUIRE() (spinlock_acquire(&proc_getas()->pagedirectory->lock))
-#define PG_LOCK_RELEASE() (spinlock_release(&proc_getas()->pagedirectory->lock))
+#define PG_LOCK_ACQUIRE() (spinlock_acquire(&(proc_getas()->pagedirectory->lock)))
+#define PG_LOCK_RELEASE() (spinlock_release(&(proc_getas()->pagedirectory->lock)))
 
 
 struct pagetable *create_pagetable(void);
@@ -19,6 +19,11 @@ paddr_t* pagetable_lookup_tableref(vaddr_t, struct pagetable **);
  */
 struct pagetable *create_pagetable()
 {
+
+    kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("CREATE PAGETABLE");
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+
     struct pagetable *pagetable;
 
     if ((pagetable = kmalloc(sizeof(struct pagetable))) == NULL)
@@ -26,10 +31,22 @@ struct pagetable *create_pagetable()
         return NULL;
     }
 
+
     pagetable->n_entries = 0;
+
+kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("ZERO OUT");
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 
     // Zero the page entries
     bzero(pagetable->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
+
+kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
+	kprintf("RETURN");
+        kprintf("\n proc_getas(): 0x%08x\n", (int) curproc->p_addrspace); //->pagedirectory->lock
+    kprintf("\n proc_getas()->pagedirectory: %p\n",  curproc->p_addrspace->pagedirectory); //->pagedirectory->lock
+
+	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 
     return pagetable;
 }
@@ -92,7 +109,10 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
     }
     kprintf("\nReleasing\n");
     kprintf("\n proc_getas(): 0x%08x\n", (int) curproc->p_addrspace); //->pagedirectory->lock
+    kprintf("\n proc_getas()->pagedirectory: %p\n",  curproc->p_addrspace->pagedirectory); //->pagedirectory->lock
+
     PG_LOCK_RELEASE();
+    
 
     kprintf("\nReturn\n");
     // Return pointer to frame value. May be null (in the event of frame not allocated)    
