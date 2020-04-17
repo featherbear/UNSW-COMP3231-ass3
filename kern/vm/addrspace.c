@@ -232,9 +232,9 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 	*region = (struct region) {
 		.vaddr = vaddr,
 		.memsize = memsize,
-		.readable = readable,
-		.writeable = writeable,
-		.executable = executable,
+		.readable = readable != 0,
+		.writeable = writeable != 0,
+		.executable = executable != 0,
 	};
 
 
@@ -255,11 +255,10 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 		as->regions.head = as->regions.tail = region_node;
 	}
 	
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
-	kprintf("Region assigned from 0x%08x to 0x%08x as %s%s%s", 
+	// FIXME: REMOVE
+	kprintf("Region assigned from 0x%08x to 0x%08x as %s%s%s\n", 
 	vaddr, vaddr+memsize-1, readable ? "r" : "-",  writeable ? "w" : "-",  executable ? "x" : "-"
 	);
-	kprintf("\nCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINTCHECKPOINT\n");
 
 	// FIXME: Return code
 	return 0;
@@ -278,9 +277,7 @@ as_prepare_load(struct addrspace *as)
 	struct region_node *node = as->regions.head;
 
 	while (node != NULL) {
-		kprintf("%u->", node->value->writeable);
 		node->value->writeable = (node->value->writeable << 1) | 1;
-		kprintf("%u\n", node->value->writeable);
 		/*
 		 00 -> 01
 		 01 -> 11
