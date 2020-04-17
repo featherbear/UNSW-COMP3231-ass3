@@ -74,7 +74,7 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
 
 
     PG_LOCK_ACQUIRE();
-    
+
     // Create level 2 pagetable if it does not exist
     if (*pagetable_reference == NULL)
     {
@@ -112,30 +112,21 @@ int pagetable_set(vaddr_t address, paddr_t addr) {
  */
 struct pagedirectory *pagedirectory_init()
 {
-    struct pagedirectory *pagedirectory = NULL;
+    struct pagedirectory *pagedirectory;
 
     if ((pagedirectory = kmalloc(sizeof(struct pagedirectory))) == NULL)
     {
         return NULL;
     }
 
-    spinlock_init(&pagedirectory->lock);
-
-
-    // FIXME: Don't need this - it's already implemented in unsw.c
-    // FIXME: paddr_t highest_physical_addr = ram_getsize();
-    // FIXME: paddr_t lowest_physical_addr = ram_getfirstfree();
-    // FIXME: unsigned int n_entries = (highest_physical_addr - lowest_physical_addr) / PAGE_SIZE;
-
     if ((pagedirectory->entries = kmalloc(PAGE_ENTRY_LIMIT * sizeof(struct pagetable *))) == NULL)
     {
-        spinlock_cleanup(&pagedirectory->lock);
+        kfree(pagedirectory);
         return NULL;
     }
-
     bzero(pagedirectory->entries, PAGE_ENTRY_LIMIT * sizeof(struct pagetable *));
 
-    // Success
+    spinlock_init(&pagedirectory->lock);
 
     return pagedirectory;
 }
@@ -143,12 +134,14 @@ struct pagedirectory *pagedirectory_init()
 void pagedirectory_cleanup(struct pagedirectory *pagedirectory) {
     // Also free the frametable pages??? - What about shared frames???
     
+    spinlock_cleanup(&pagedirectory->lock);
+    
     if (pagedirectory->entries != NULL) {
         for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
             kfree(pagedirectory->entries[i]);
         }
     }
+    
     kfree(pagedirectory->entries);
-
-    spinlock_cleanup(&pagedirectory->lock);
+    kfree(pagedirectory);
 }
