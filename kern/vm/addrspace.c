@@ -268,7 +268,7 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 	}
 	
 	// FIXME: REMOVE
-	// kprintf("Region assigned from 0x%08x to 0x%08x as %s%s%s\n", vaddr, vaddr+memsize-1, readable ? "r" : "-",  writeable ? "w" : "-",  executable ? "x" : "-" );
+	kprintf("Region for AS %p assigned from 0x%08x to 0x%08x as %s%s%s\n", as, vaddr, vaddr+memsize-1, readable ? "r" : "-",  writeable ? "w" : "-",  executable ? "x" : "-" );
 
 	// FIXME: Return code
 	return 0;
@@ -292,7 +292,7 @@ as_prepare_load(struct addrspace *as)
 		 00 -> 01
 		 01 -> 11
 		 |\ 
-		 | Writable
+		 | Writeable
 		 Temp bit
 		*/
 
@@ -315,7 +315,7 @@ as_complete_load(struct addrspace *as)
 		 01 -> 00
 		 11 -> 01
 		 |\ 
-		 | Writable
+		 | Writeable
 		 Temp bit
 		*/
 
@@ -352,7 +352,7 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 
 static void __clear_tlb(void) {
 	int spl = splhigh();
-	for (int i = 0; i < 64; i++) {
+	for (int i = 0; i < NUM_TLB; i++) {
 		tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
 	}
 	splx(spl);
