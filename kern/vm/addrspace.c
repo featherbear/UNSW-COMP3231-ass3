@@ -63,12 +63,15 @@ as_create(void)
 {
 	struct addrspace *as;
 
-	as = kmalloc(sizeof(struct addrspace));
-	if (as == NULL) {
+	if ((as = kmalloc(sizeof(struct addrspace))) == NULL) {
 		return NULL;
 	}
 
-	as->pagedirectory = pagedirectory_init();
+	if ((as->pagedirectory = pagedirectory_init()) == NULL) {
+		kfree(as);
+		return NULL;
+	};
+
 	as->regions = (struct region_container) {
 		.head = NULL,
 		.tail = NULL
@@ -89,9 +92,7 @@ int
 as_copy(struct addrspace *old, struct addrspace **ret)
 {
 	struct addrspace *new_as;
-
-	new_as = as_create();
-	if (new_as==NULL) {
+	if ((new_as = as_create()) == NULL) {
 		return ENOMEM;
 	}
 
@@ -105,6 +106,7 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
 		if (old_entries[i] != NULL) {
 			struct pagetable *entry = kmalloc(sizeof(struct pagetable));
+			
 			// if (entry == NULL) {
 			// 	as_destroy(new_as);
 			// }
