@@ -482,6 +482,9 @@ proc_setas(struct addrspace *newas)
 	spinlock_acquire(&proc->p_lock);
 	oldas = proc->p_addrspace;
 	proc->p_addrspace = newas;
+	
+	kprintf("\n 0x%08x \n", (int) proc->p_addrspace->pagedirectory);
+
 	spinlock_release(&proc->p_lock);
 	return oldas;
 }

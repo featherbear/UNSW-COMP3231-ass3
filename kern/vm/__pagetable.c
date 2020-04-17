@@ -3,6 +3,7 @@
 #include <lib.h>
 #include <addrspace.h>
 #include <proc.h>
+#include <current.h>
 
 #define PG_LOCK_ACQUIRE() (spinlock_acquire(&proc_getas()->pagedirectory->lock))
 #define PG_LOCK_RELEASE() (spinlock_release(&proc_getas()->pagedirectory->lock))
@@ -90,7 +91,7 @@ paddr_t* pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref)
         *tableref = *pagetable_reference;
     }
     kprintf("\nReleasing\n");
-    kprintf("\n proc_getas():: 0x%08x\n", (int) proc_getas()->pagedirectory); //->pagedirectory->lock
+    kprintf("\n proc_getas(): 0x%08x\n", (int) curproc->p_addrspace); //->pagedirectory->lock
     PG_LOCK_RELEASE();
 
     kprintf("\nReturn\n");
