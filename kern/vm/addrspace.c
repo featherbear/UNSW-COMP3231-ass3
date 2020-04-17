@@ -91,7 +91,6 @@ as_create(void)
 int
 as_copy(struct addrspace *old, struct addrspace **ret)
 {
-	kprintf("\nCOPY\n");
 	struct addrspace *new_as;
 	if ((new_as = as_create()) == NULL) {
 		return ENOMEM;
@@ -106,11 +105,6 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 
 	for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
 		if (old_entries[i] != NULL) {
-			for (int j = 0; j < PAGE_ENTRY_LIMIT; j++) {
-				if (old_entries[i]->entries[j] != (paddr_t) NULL) {
-					kprintf("Frame found at [%d][%d] -> 0x%08x\n", i, j, old_entries[i]->entries[j]);
-				}
-			}
 
 			struct pagetable *entry = kmalloc(sizeof(struct pagetable));
 			if (entry == NULL) {
@@ -123,7 +117,6 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 				as_destroy(new_as);
 				return ENOMEM;
 			}
-			// bzero(entry->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
 
 			memcpy(entry->entries, old_entries[i]->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
 
@@ -150,13 +143,6 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 
 		region_node = region_node->next;
 	}
-
-	// FIXME: Remove
-	// kprintf("Created `as = 0x%08x`\n", (vaddr_t) new_as);
-	// FIXME: Remove
-
-
-	kprintf("\nCOPY FINISH\n");
 
 	*ret = new_as;
 	return 0;
