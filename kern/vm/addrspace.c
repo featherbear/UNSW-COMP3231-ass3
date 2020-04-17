@@ -212,7 +212,7 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t memsize,
 	*region_node = (struct region_node) {
 		.value = region,
 		.next = NULL
-	}
+	};
 
 	if (as->regions->head) {
 		if (as->regions->tail) {
