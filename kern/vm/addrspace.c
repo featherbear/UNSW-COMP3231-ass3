@@ -118,7 +118,7 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 				return ENOMEM;
 			}
 			
-			if ((entry->entries = (paddr_t *) kmalloc(PAGE_ENTRY_LIMIT * sizeof(paddr_t)) == NULL)) {
+			if ((entry->entries = (paddr_t *) kmalloc(PAGE_ENTRY_LIMIT * sizeof(paddr_t))) == NULL) {
 				kfree(entry);
 				as_destroy(new_as);
 				return ENOMEM;
