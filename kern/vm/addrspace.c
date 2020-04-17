@@ -123,7 +123,9 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 				as_destroy(new_as);
 				return ENOMEM;
 			}
-			memcpy(entry->entries, &old_entries[i]->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
+			// bzero(entry->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
+
+			memcpy(entry->entries, old_entries[i]->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
 
 			entry->n_entries = old_entries[i]->n_entries;
 

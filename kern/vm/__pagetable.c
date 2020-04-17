@@ -31,7 +31,11 @@ struct pagetable *create_pagetable()
     pagetable->n_entries = 0;
 
     // Zero the page entries
-    pagetable->entries = kmalloc(PAGE_ENTRY_LIMIT * sizeof(paddr_t));
+    if ((pagetable->entries = kmalloc(PAGE_ENTRY_LIMIT * sizeof(paddr_t))) == NULL) {
+        kfree(pagetable);
+        return NULL;
+    };
+    
     bzero(pagetable->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
 
     return pagetable;
