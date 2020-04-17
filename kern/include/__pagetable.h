@@ -19,10 +19,10 @@ struct pagetable
     paddr_t entries[];
 };
 
-paddr_t pagetable_lookup(vaddr_t address);
-int pagetable_set(vaddr_t address, int frame_no);
-struct pagedirectory *pagedirectory_init();
-void pagedirectory_cleanup(struct pagedirectory *pagedirectory);
+paddr_t pagetable_lookup(vaddr_t);
+int pagetable_set(vaddr_t, paddr_t);
+struct pagedirectory *pagedirectory_init(void);
+void pagedirectory_cleanup(struct pagedirectory *);
 
 #define PAGE_ENTRY_LIMIT 1024 /* 2^10 == 1024 */
 

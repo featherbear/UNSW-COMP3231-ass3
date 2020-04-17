@@ -1,12 +1,15 @@
 #include <__pagetable.h>
 #include <vm.h>
 #include <lib.h>
+#include <addrspace.h>
+#include <current.h>
 
-#define PG_LOCK_ACQUIRE() (spinlock_acquire(&pagedirectory->lock))
-#define PG_LOCK_RELEASE() (spinlock_release(&pagedirectory->lock))
+#define PG_LOCK_ACQUIRE() (spinlock_acquire(&curproc->p_addrspace->pagedirectory->lock))
+#define PG_LOCK_RELEASE() (spinlock_release(&curproc->p_addrspace->pagedirectory->lock))
 
 
 struct pagetable *create_pagetable(void);
+paddr_t pagetable_lookup_tableref(vaddr_t, struct pagetable **);
 
 /*
  * Creates a level 2 page table.
@@ -39,6 +42,7 @@ paddr_t pagetable_lookup(vaddr_t address)
 }
 
 paddr_t pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) {
+    struct pagedirectory *pagedirectory = curproc->p_addrspace->pagedirectory;
     /*
      VIRTUAL_MEMORY_ADDRESS
        |       |       \ 
@@ -46,7 +50,7 @@ paddr_t pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) 
        \       10 bits - level 2 offset
         10 bits - level 1 offset
     */
-   
+
     // FIXME: Check for Kernel address?
 
     int page_number = address >> 12; // (_address & PAGE_FRAME) >> 12;
@@ -80,16 +84,19 @@ paddr_t pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) 
 
 }
 
-int pagetable_set(vaddr_t address, int frame_no) {
+int pagetable_set(vaddr_t address, paddr_t addr) {
     struct pagetable *table = NULL;
     int *frame_reference = pagetable_lookup_tableref(address, &table);
+
     PG_LOCK_ACQUIRE();
     if (*frame_reference == NULL) {
         table->n_entries++;
     }
     PG_LOCK_RELEASE();
 
-    *frame_reference = frame_no;
+    *frame_reference = addr;
+
+    return 0;
 }
 /* 
  * Creates the first level page table. 
