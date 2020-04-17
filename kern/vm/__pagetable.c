@@ -6,6 +6,7 @@
 #define PG_LOCK_RELEASE() (spinlock_release(&pagedirectory->lock))
 
 
+struct pagetable *create_pagetable(void);
 
 /*
  * Creates a level 2 page table.
@@ -23,10 +24,8 @@ struct pagetable *create_pagetable()
 
     pagetable->n_entries = 0;
 
-    // Assign page table references
-    pagetable->entries = kmalloc(sizeof(PAGE_ENTRY_LIMIT * sizeof(paddr_t)));
-    kassert(pagetable->entries != NULL);
-    bzero(pagetable->entries, PAGE_ENTRY_LIMIT * sizeof(int));
+    // Zero the page entries
+    bzero(pagetable->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
 
     return pagetable;
 }
@@ -40,13 +39,14 @@ paddr_t pagetable_lookup(vaddr_t address)
 }
 
 paddr_t pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) {
-
-    // VIRTUAL_MEMORY_ADDRESS
-    //   |       |       \ 
-    //   |       \        12 bits - offset
-    //   \       10 bits - level 2 offset
-    //    10 bits - level 1 offset
-
+    /*
+     VIRTUAL_MEMORY_ADDRESS
+       |       |       \ 
+       |       \        12 bits - offset
+       \       10 bits - level 2 offset
+        10 bits - level 1 offset
+    */
+   
     // FIXME: Check for Kernel address?
 
     int page_number = address >> 12; // (_address & PAGE_FRAME) >> 12;
@@ -67,7 +67,7 @@ paddr_t pagetable_lookup_tableref(vaddr_t address, struct pagetable** tableref) 
     if (*pagetable_reference == NULL)
     {
         *pagetable_reference = create_pagetable();
-        kassert(*pagetable_reference != NULL);
+        KASSERT(*pagetable_reference != NULL);
     }
 
     if (tableref != NULL) {

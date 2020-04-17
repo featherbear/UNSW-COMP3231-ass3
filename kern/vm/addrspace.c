@@ -49,14 +49,7 @@
  */
 
 /* */
-
-void __clear_tlb() {
-	int spl = splhigh();
-	for (int i = 0; i < 64; i++) {
-		tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
-	}
-	splx(spl);
-}
+static void __clear_tlb(void);
 
 /*
  create a new empty address space. 
@@ -109,8 +102,8 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	struct pagedirectory *new_pagedirectory = new_as->pagedirectory;
 
 	// Replicate page table structure
-	struct pagetable *old_entries[] = old_pagedirectory->entries;
-	struct pagetable *new_entries[] = new_pagedirectory->entries;
+	struct pagetable **old_entries = old_pagedirectory->entries;
+	struct pagetable **new_entries = new_pagedirectory->entries;
 
 	for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
 		if (old_entries[i] != NULL) {
@@ -124,7 +117,7 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	}
 
 	// Replicate region structure
-	struct region_node *region_node = old_as->regions.head;
+	struct region_node *region_node = old->regions.head;
 	struct region *region;
 	while (region_node != NULL) {
 		region = region_node->value;
@@ -283,11 +276,13 @@ as_prepare_load(struct addrspace *as)
 
 	while (node != NULL) {
 		node->value->writeable = (node->value->writeable << 1) | 1;
-		// 00 -> 01
-		// 01 -> 11
-		// |\ 
-		// | Writable
-		// Temp bit
+		/*
+		 00 -> 01
+		 01 -> 11
+		 |\ 
+		 | Writable
+		 Temp bit
+		*/
 
 		node = node->next;
 	}
@@ -305,11 +300,13 @@ as_complete_load(struct addrspace *as)
 
 	while (node != NULL) {
 		node->value->writeable >>= 1;
-		// 01 -> 00
-		// 11 -> 01
-		// |\ 
-		// | Writable
-		// Temp bit
+		/*
+		 01 -> 00
+		 11 -> 01
+		 |\ 
+		 | Writable
+		 Temp bit
+		*/
 
 		node = node->next;
 	}
@@ -341,3 +338,11 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr)
 	return 0;
 }
 
+
+static void __clear_tlb(void) {
+	int spl = splhigh();
+	for (int i = 0; i < 64; i++) {
+		tlb_write(TLBHI_INVALID(i), TLBLO_INVALID(), i);
+	}
+	splx(spl);
+}
