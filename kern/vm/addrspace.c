@@ -102,15 +102,21 @@ as_copy(struct addrspace *old, struct addrspace **ret)
 	struct pagetable **old_entries = old_pagedirectory->entries;
 	struct pagetable **new_entries = new_pagedirectory->entries;
 
+	spinlock_acquire(&(new_pagedirectory->lock));
+
 	// Replicate page table structure
 	for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
 		if (old_entries[i] != NULL) {
 			if ((new_entries[i] = pagetable_clone(old_entries[i])) == NULL) {
+				spinlock_release(&(new_pagedirectory->lock));
 				as_destroy(new_as);
 				return ENOMEM;
 			}
 		}
 	}
+
+	spinlock_release(&(new_pagedirectory->lock));
+
 
 	// Replicate region structure
 	struct region_node *region_node = old->regions.head;

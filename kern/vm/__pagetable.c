@@ -54,7 +54,19 @@ struct pagetable *pagetable_clone(struct pagetable *reference) {
         return NULL;
     }
 
-    memcpy(table->entries, reference->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
+    bzero(table->entries, PAGE_ENTRY_LIMIT * sizeof(paddr_t));
+
+    for (int i = 0; i < PAGE_ENTRY_LIMIT; i++) {
+        if (reference->entries[i] == (paddr_t) NULL) {
+            continue;
+        }
+
+        vaddr_t newFrame = alloc_kpages(1);
+        memcpy((void*) newFrame, (void*) PADDR_TO_KVADDR(reference->entries[i]), PAGE_SIZE);
+        table->entries[i] = KVADDR_TO_PADDR(newFrame);
+    }
+
+
 
     table->n_entries = reference->n_entries;
 
